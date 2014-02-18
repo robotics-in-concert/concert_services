@@ -1,0 +1,30 @@
+<package>
+  <name>rocon_service_teleop</name>
+  <version>0.1.0</version>
+  <description>
+      Teleop by request from a rocon interactive program.
+  </description>
+  <maintainer email="d.stonier@gmail.com">Daniel Stonier</maintainer>
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/rocon_service_teleop</url>
+  <url type="repository">https://github.com/robotics-in-concert/rocon_services</url>
+  <url type="bugtracker">https://github.com/robotics-in-concert/rocon_services/issues</url>
+  <author>Daniel Stonier</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>rospy</run_depend>
+  <run_depend>rocon_python_comms</run_depend>
+  <run_depend>rocon_std_msgs</run_depend>
+  <!-- 
+  <run_depend>turtlesim</run_depend>
+  <run_depend>rocon_gateway</run_depend>
+  <run_depend>gateway_msgs</run_depend>
+  <run_depend>rocon_tutorial_msgs</run_depend>
+  <run_depend>rocon_app_manager_msgs</run_depend>
+   -->
+
+  <export>
+    <rocon_service>services/teleop/teleop.service</rocon_service>
+  </export>
+</package>
