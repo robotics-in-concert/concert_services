@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8.3)
-project(rocon_service_turtlesim)
+project(rocon_service_teleop)
 
 ##############################################################################
 # Catkin
