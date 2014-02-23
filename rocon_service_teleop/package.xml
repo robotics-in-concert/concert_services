@@ -16,13 +16,8 @@
   <run_depend>rospy</run_depend>
   <run_depend>rocon_python_comms</run_depend>
   <run_depend>rocon_std_msgs</run_depend>
-  <!-- 
-  <run_depend>turtlesim</run_depend>
-  <run_depend>rocon_gateway</run_depend>
-  <run_depend>gateway_msgs</run_depend>
-  <run_depend>rocon_tutorial_msgs</run_depend>
-  <run_depend>rocon_app_manager_msgs</run_depend>
-   -->
+  <run_depend>rocon_service_msgs</run_depend>
+  <run_depend>scheduler_msgs</run_depend>
 
   <export>
     <rocon_service>services/teleop/teleop.service</rocon_service>
