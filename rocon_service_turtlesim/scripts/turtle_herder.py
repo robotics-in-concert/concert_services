@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#       
+#
 # License: BSD
 #   https://raw.github.com/robotics-in-concert/rocon_tutorials/license/LICENSE
 #
@@ -27,8 +27,7 @@ import copy
 
 import rospy
 import rocon_python_comms
-import rocon_gateway
-
+import rocon_gateway_utils
 import turtlesim.srv as turtlesim_srvs
 import rocon_tutorial_msgs.msg as rocon_tutorial_msgs
 import gateway_msgs.msg as gateway_msgs
@@ -37,6 +36,7 @@ import gateway_msgs.srv as gateway_srvs
 ##############################################################################
 # Classes
 ##############################################################################
+
 
 class TurtleHerder:
     '''
@@ -64,7 +64,7 @@ class TurtleHerder:
         self._kill_turtle_service_client = rospy.ServiceProxy('~internal/kill', turtlesim_srvs.Kill, persistent=True)
         # kill the default turtle that turtlesim starts with
         try:
-            response = self._kill_turtle_service_client("turtle1")
+            unused_response = self._kill_turtle_service_client("turtle1")
         except rospy.ServiceException:
             rospy.logerr("Spawn Turtles : failed to contact the internal kill turtle service")
         except rospy.ROSInterruptException:
@@ -75,9 +75,8 @@ class TurtleHerder:
         self._kill_turtle_service_pair_server = rocon_python_comms.ServicePairServer('kill', self._kill_turtle_service, rocon_tutorial_msgs.KillTurtlePair, use_threads=True)
         self._spawn_turtle_service_pair_server = rocon_python_comms.ServicePairServer('spawn', self._spawn_turtle_service, rocon_tutorial_msgs.SpawnTurtlePair, use_threads=True)
         # gateway
-        gateway_namespace = rocon_gateway.resolve_local_gateway()
+        gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         self._gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
-        
 
     def _kill_turtle_service(self, request_id, msg):
         '''
@@ -89,7 +88,7 @@ class TurtleHerder:
         response = rocon_tutorial_msgs.KillTurtleResponse()
         internal_service_request = turtlesim_srvs.KillRequest(msg.name)
         try:
-            internal_service_response = self._kill_turtle_service_client(internal_service_request)
+            unused_internal_service_response = self._kill_turtle_service_client(internal_service_request)
             self.turtles.remove(msg.name)
         except rospy.ServiceException:  # communication failed
             rospy.logerr("Spawn Turtles : failed to contact the internal kill turtle service")
@@ -114,14 +113,14 @@ class TurtleHerder:
             name_extension = '_' + str(count)
             count = count + 1
         name = name + name_extension
-        # 
+
         internal_service_request = turtlesim_srvs.SpawnRequest(
                                             random.uniform(3.5, 6.5),
                                             random.uniform(3.5, 6.5),
                                             random.uniform(0.0, 2.0 * math.pi),
                                             name)
         try:
-            internal_service_response = self._spawn_turtle_service_client(internal_service_request)
+            unused_internal_service_response = self._spawn_turtle_service_client(internal_service_request)
             self.turtles.append(name)
         except rospy.ServiceException:  # communication failed
             rospy.logerr("TurtleHerder : failed to contact the internal spawn turtle service")
@@ -162,11 +161,10 @@ class TurtleHerder:
             rospy.loginfo("TurtleHerder : shutdown while contacting the gateway flip service")
             return
 
-
     def shutdown(self):
         for name in self.turtles:
             try:
-                internal_service_response = self._kill_turtle_service_client(name)
+                unused_internal_service_response = self._kill_turtle_service_client(name)
             except rospy.ServiceException:  # communication failed
                 break  # quietly fail
             except rospy.ROSInterruptException:
@@ -177,9 +175,9 @@ class TurtleHerder:
 ##############################################################################
 
 if __name__ == '__main__':
-    
+
     rospy.init_node('turtle_herder')
-    
+
     turtle_herder = TurtleHerder()
 #     spawn_turtle = rocon_python_comms.ServicePairClient('spawn', rocon_tutorial_msgs.SpawnTurtlePair)
 #     rospy.rostime.wallsleep(0.5)
