@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-#       
+#
 # License: BSD
-#   https://raw.github.com/robotics-in-concert/rocon_tutorials/license/LICENSE
+#   https://raw.github.com/robotics-in-concert/rocon_services/license/LICENSE
 #
 ##############################################################################
 # About
 ##############################################################################
 
-# Simple script to connect to the turtlesim engine and 'hatch'. 
+# Simple script to connect to the turtlesim engine and 'hatch'.
 #
 # - watch the app manager status and when it has a remote controller,
 # - flip a spawn/kill pair across
@@ -19,19 +19,21 @@
 ##############################################################################
 
 import copy
+import threading
+
 import rospy
 import rocon_python_comms
-import rocon_gateway
 import rocon_tutorial_msgs.msg as rocon_tutorial_msgs
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
 import std_msgs.msg as std_msgs
 import rocon_app_manager_msgs.msg as rocon_app_manager_msgs
-import threading
+import rocon_gateway_utils
 
 ##############################################################################
 # Classes
 ##############################################################################
+
 
 class Hatchling:
     '''
@@ -53,9 +55,9 @@ class Hatchling:
         self.spawn_turtle = rocon_python_comms.ServicePairClient('spawn', rocon_tutorial_msgs.SpawnTurtlePair)
         self.kill_turtle = rocon_python_comms.ServicePairClient('kill', rocon_tutorial_msgs.KillTurtlePair)
         # gateway
-        gateway_namespace = rocon_gateway.resolve_local_gateway()
+        gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         self.gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
-        self.name = rocon_gateway.resolve_gateway_info(gateway_namespace).name
+        self.name = rocon_gateway_utils.resolve_gateway_info(gateway_namespace).name
         # app manager
         rospy.Subscriber('remote_controller', std_msgs.String, self._ros_subscriber_remote_controller)
         self.remote_controller = rocon_app_manager_msgs.Constants.NO_REMOTE_CONTROLLER
