@@ -20,6 +20,7 @@
   <run_depend>rocon_service_msgs</run_depend>
   <run_depend>rocon_std_msgs</run_depend>
   <run_depend>scheduler_msgs</run_depend>
+  <run_depend>unique_id</run_depend>
 
   <export>
     <rocon_service>services/teleop/teleop.service</rocon_service>
