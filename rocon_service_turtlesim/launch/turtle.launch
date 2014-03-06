@@ -18,7 +18,7 @@
     </include>
     <node pkg="rocon_service_turtlesim" type="hatchling.py" name="$(anon hatchling)">
       <remap from="remote_controller" to="app_manager/remote_controller"/>
-      <!-- Concert turtlesim service remaps -->
+      <!-- Concert turtlesim service remaps --> 
       <remap from="spawn/request" to="services/turtlesim/spawn/request"/>
       <remap from="spawn/response" to="services/turtlesim/spawn/response"/>
       <remap from="kill/request" to="services/turtlesim/kill/request"/>

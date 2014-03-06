@@ -91,7 +91,7 @@ class Hatchling:
             remote_rule.rule = rule
             request.remotes.append(copy.deepcopy(remote_rule))
         try:
-            response = self.gateway_flip_service(request)
+            unused_response = self.gateway_flip_service(request)
         except rospy.ServiceException:  # communication failed
             rospy.logerr("Hatchling : failed to send flip rules")
             return
@@ -117,7 +117,7 @@ class Hatchling:
             event_is_set = self.event_remote_controller_changed.wait(0.5)
             if event_is_set:  # clear it so that it blocks again at the next run.
                 self.event_remote_controller_changed.clear()
-            if interacting_with_remote_controller is None: # check if we have a remote controller state change and send flips
+            if interacting_with_remote_controller is None:  # check if we have a remote controller state change and send flips
                 # Just send off one set of flips at a time, have to make sure we process kill/spawn
                 if len(self.remote_controller_updates) > 0:
                     try:
@@ -136,7 +136,7 @@ class Hatchling:
                 if response:  # didn't time out, probably waiting for the flips to arrive.
                     self.remote_controller = interacting_with_remote_controller
                     interacting_with_remote_controller = None
-            
+
 
 ##############################################################################
 # Launch point
