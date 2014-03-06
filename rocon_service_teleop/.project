@@ -3,6 +3,9 @@
 	<name>rocon_service_teleop</name>
 	<comment></comment>
 	<projects>
+		<project>concert_schedulers</project>
+		<project>rocon_python_comms</project>
+		<project>unique_id</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

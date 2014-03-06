@@ -14,10 +14,13 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>rospy</run_depend>
+  <run_depend>rocon_app_manager_msgs</run_depend>
   <run_depend>rocon_python_comms</run_depend>
-  <run_depend>rocon_std_msgs</run_depend>
+  <run_depend>rocon_scheduler_requests</run_depend>
   <run_depend>rocon_service_msgs</run_depend>
+  <run_depend>rocon_std_msgs</run_depend>
   <run_depend>scheduler_msgs</run_depend>
+  <run_depend>unique_id</run_depend>
 
   <export>
     <rocon_service>services/teleop/teleop.service</rocon_service>
