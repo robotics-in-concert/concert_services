@@ -123,7 +123,7 @@ class TeleopPimp:
         # Todo : request the scheduler for this resource,
         # use self.allocation_timeout to fail gracefully
         self.lock.acquire()
-        if response.rocon_uri not in [c.platform_info.uri for c in self.teleopable_robots]:
+        if msg.rocon_uri not in [c.platform_info.uri for c in self.teleopable_robots]:
             response.result = False
             self.allocate_teleop_service_pair_server.reply(request_id, response)
         else:
@@ -140,6 +140,7 @@ class TeleopPimp:
                 if resource_request_id not in self.pending_requests:
                     response.result = True
                     break
+                rospy.rostime.wallsleep(0.1)
             if response.result == False:
                 self.requester.rset[resource_request_id].cancel()
             self.allocate_teleop_service_pair_server.reply(request_id, response)
