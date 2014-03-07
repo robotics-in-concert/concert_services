@@ -24,13 +24,12 @@ import time
 import rospy
 import rocon_python_comms
 import concert_msgs.msg as concert_msgs
+import concert_service_utilities
 import rocon_app_manager_msgs.msg as rapp_manager_msgs
 import rocon_scheduler_requests
 import unique_id
-import rocon_tutorial_msgs.srv as rocon_tutorial_srvs
 import rocon_std_msgs.msg as rocon_std_msgs
 import scheduler_msgs.msg as scheduler_msgs
-import geometry_msgs.msg as geometry_msgs
 import rocon_service_msgs.msg as rocon_service_msgs
 
 ##############################################################################
@@ -43,7 +42,9 @@ class TeleopPimp:
       Listens for requests to gain a teleop'able robot.
     '''
     __slots__ = [
-        'name',
+        'service_name',
+        'service_description',
+        'service_id',
         'scheduler_resources_subscriber',
         'list_available_teleops_server',
         'available_teleops_publisher',
@@ -55,21 +56,22 @@ class TeleopPimp:
     ]
 
     def __init__(self):
+        (self.service_name, self.service_description, self.service_id) = concert_service_utilities.get_service_info()
+
         # could use find_topic here, but would need to intelligently sort the non-unique list that comes back
         self.concert_clients_subscriber = rospy.Subscriber(concert_msgs.Strings.CONCERT_CLIENTS, concert_msgs.ConcertClients, self.ros_concert_clients_callback)
         self.scheduler_resources_subscriber = rospy.Subscriber("scheduler_resources", scheduler_msgs.KnownResources, self.ros_scheduler_resources_callback)
         self.available_teleops_publisher = rospy.Publisher('available_teleops', rocon_std_msgs.StringArray, latch=True)
         self.teleopable_robots = []
-        self.requester = self.setup_requester()
+        self.requester = self.setup_requester(self.service_id)
         self.lock = threading.Lock()
         self.pending_requests = []
 
         self.allocate_teleop_service_pair_server = rocon_python_comms.ServicePairServer('capture_teleop', self.ros_capture_teleop_callback, rocon_service_msgs.CaptureTeleopPair, use_threads=True)
         self.allocation_timeout = 5.0  # seconds
 
-    def setup_requester(self):
-        uuid = None
-        topic = rocon_scheduler_requests.common.SCHEDULER_TOPIC
+    def setup_requester(self, uuid):
+        topic = concert_msgs.Strings.SCHEDULER_REQUESTS
         frequency = rocon_scheduler_requests.common.HEARTBEAT_HZ
         return rocon_scheduler_requests.Requester(self.requester_feedback, uuid, 0, topic, frequency)
 
