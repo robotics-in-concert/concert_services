@@ -133,7 +133,7 @@ class TeleopPimp:
             resource = scheduler_msgs.Resource()
             resource.id = unique_id.toMsg(unique_id.fromRandom())
             resource.rapp = 'turtle_concert/teleop'
-            resource.uri = 'rocon:/'
+            resource.uri = msg.rocon_uri
             resource_request_id = self.requester.new_request([resource])
             self.pending_requests.append(resource_request_id)
             self.requester.send_requests()
