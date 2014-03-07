@@ -157,7 +157,7 @@ class TeleopPimp:
           @param request_set : the modified requests
           @type dic { uuid.UUID : scheduler_msgs.ResourceRequest }
         '''
-        for request_id, request in request_set.iteritems():
+        for request_id, request in request_set.requests.iteritems():
             if request_id in self.pending_requests:
                 if request.msg.status == scheduler_msgs.Request.GRANTED:
                     self.pending_requests.remove(request_id)
