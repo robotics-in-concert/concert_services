@@ -1,0 +1,10 @@
+###############################################################################
+# Teleoperations
+###############################################################################
+
+- name: concert_teleop_app
+  role: 'User'
+  compatibility: rocon:/pc/*/hydro|indigo/*
+  display_name: Concert Teleop
+  description: Select and teleop a robot in the concert
+  max: -1
