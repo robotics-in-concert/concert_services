@@ -18,6 +18,7 @@
 # Imports
 ##############################################################################
 
+import sys
 import threading
 import time
 
@@ -25,7 +26,6 @@ import rospy
 import rocon_python_comms
 import concert_msgs.msg as concert_msgs
 import concert_service_utilities
-import rocon_app_manager_msgs.msg as rapp_manager_msgs
 import rocon_scheduler_requests
 import unique_id
 import rocon_std_msgs.msg as rocon_std_msgs
@@ -56,11 +56,20 @@ class TeleopPimp:
     ]
 
     def __init__(self):
+        ####################
+        # Discovery
+        ####################
         (self.service_name, self.service_description, self.service_id) = concert_service_utilities.get_service_info()
+        try:
+            known_resources_topic_name = rocon_python_comms.find_topic('scheduler_msgs/KnownResources', timeout=rospy.rostime.Duration(5.0), unique=True)
+        except rocon_python_comms.NotFoundException as e:
+            rospy.logerr("TeleopPimp : could not locate the scheduler's known resources topic [%s]" % str(e))
+            sys.exit(1)
 
-        # could use find_topic here, but would need to intelligently sort the non-unique list that comes back
-        self.concert_clients_subscriber = rospy.Subscriber(concert_msgs.Strings.CONCERT_CLIENTS, concert_msgs.ConcertClients, self.ros_concert_clients_callback)
-        self.scheduler_resources_subscriber = rospy.Subscriber("scheduler_resources", scheduler_msgs.KnownResources, self.ros_scheduler_resources_callback)
+        ####################
+        # Setup
+        ####################
+        self.concert_clients_subscriber = rospy.Subscriber(known_resources_topic_name, scheduler_msgs.KnownResources, self.ros_scheduler_known_resources_callback)
         self.available_teleops_publisher = rospy.Publisher('available_teleops', rocon_std_msgs.StringArray, latch=True)
         self.teleopable_robots = []
         self.requester = self.setup_requester(self.service_id)
@@ -75,45 +84,37 @@ class TeleopPimp:
         frequency = rocon_scheduler_requests.common.HEARTBEAT_HZ
         return rocon_scheduler_requests.Requester(self.requester_feedback, uuid, 0, topic, frequency)
 
-    def ros_concert_clients_callback(self, msg):
+    def ros_scheduler_known_resources_callback(self, msg):
         '''
           This is the hack right now till we can use ros_scheduler_resources_callback to introspect what is available.
           This will get called periodically. For teleop interaction development, identify and store changes to the
           teleopable robots list.
 
-          @TODO this could be smarter. It publishes available teleops periodically with frequency of
-          concert clients publishing instead of on state changes - noisy.
+          :param msg: incoming message
+          :type msg: scheduler_msgs.KnownResources
         '''
         # find difference of incoming and stored lists based on unique concert names
-        diff = lambda l1, l2: [x for x in l1 if x.name not in [l.name for l in l2]]
+        diff = lambda l1, l2: [x for x in l1 if x.uri not in [l.uri for l in l2]]
         # get all currently invited teleopable robots
-        clients = [client for client in msg.clients if 'turtle_concert/teleop' in [app.name for app in client.apps]]
+        resources = [r for r in msg.resources if 'turtle_concert/teleop' in r.rapps]
         self.lock.acquire()
-        new_clients = diff(clients, self.teleopable_robots)
-        lost_clients = diff(self.teleopable_robots, clients)
-        for client in new_clients:
-            self.teleopable_robots.append(client)
-        for client in lost_clients:
+        new_resources = diff(resources, self.teleopable_robots)
+        lost_resources = diff(self.teleopable_robots, resources)
+        for resource in new_resources:
+            self.teleopable_robots.append(resource)
+        for resource in lost_resources:
             # rebuild list in place without lost client
-            self.teleopable_robots[:] = [c for c in self.teleopable_robots if client.name != c.name]
+            self.teleopable_robots[:] = [r for r in self.teleopable_robots if resource.uri != r.uri]
         self.lock.release()
         self.publish_available_teleops()
+        rospy.logwarn("Teleopable robots %s" % self.teleopable_robots)
 
     def publish_available_teleops(self):
         self.lock.acquire()
         msg = rocon_std_msgs.StringArray()
-        msg.strings = [c.platform_info.uri for c in self.teleopable_robots if c.status != rapp_manager_msgs.Constants.APP_RUNNING]
+        msg.strings = [r.uri for r in self.teleopable_robots if r.status != scheduler_msgs.CurrentStatus.ALLOCATED]
         self.available_teleops_publisher.publish(msg)
         self.lock.release()
-
-    def ros_scheduler_resources_callback(self, msg):
-        """
-         Process the subscriber to the scheduler's latched publisher of known resources.
-        """
-        # Todo : relay to interaction
-        # teleops_msg =
-        # self.available_teleops_publisher.publish(teleops_msg)
-        pass
 
     def ros_capture_teleop_callback(self, request_id, msg):
         '''
@@ -125,7 +126,7 @@ class TeleopPimp:
         # Todo : request the scheduler for this resource,
         # use self.allocation_timeout to fail gracefully
         self.lock.acquire()
-        if msg.rocon_uri not in [c.platform_info.uri for c in self.teleopable_robots]:
+        if msg.rocon_uri not in [r.uri for r in self.teleopable_robots]:
             response.result = False
             self.allocate_teleop_service_pair_server.reply(request_id, response)
         else:
