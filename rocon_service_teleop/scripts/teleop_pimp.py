@@ -88,9 +88,9 @@ class TeleopPimp:
 
     def ros_scheduler_known_resources_callback(self, msg):
         '''
-          This is the hack right now till we can use ros_scheduler_resources_callback to introspect what is available.
-          This will get called periodically. For teleop interaction development, identify and store changes to the
-          teleopable robots list.
+          For teleop interaction development, identify and store changes to the
+          teleopable robots list - we get this list via the resource_pool topic
+          provided by the scheduler for introspection.
 
           :param msg: incoming message
           :type msg: scheduler_msgs.KnownResources
@@ -98,7 +98,7 @@ class TeleopPimp:
         # find difference of incoming and stored lists based on unique concert names
         diff = lambda l1, l2: [x for x in l1 if x.uri not in [l.uri for l in l2]]
         # get all currently invited teleopable robots
-        resources = [r for r in msg.resources if 'turtle_concert/teleop' in r.rapps]
+        resources = [r for r in msg.resources if 'turtle_concert/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
         self.lock.acquire()
         new_resources = diff(resources, self.teleopable_robots)
         lost_resources = diff(self.teleopable_robots, resources)
@@ -109,7 +109,6 @@ class TeleopPimp:
             self.teleopable_robots[:] = [r for r in self.teleopable_robots if resource.uri != r.uri]
         self.lock.release()
         self.publish_available_teleops()
-        #rospy.logwarn("Teleopable robots %s" % self.teleopable_robots)
 
     def publish_available_teleops(self):
         self.lock.acquire()
@@ -155,7 +154,7 @@ class TeleopPimp:
                     rospy.logwarn("TeleopPimp : couldn't capture teleopable robot [timed out][%s]" % msg.rocon_uri)
                     self.requester.rset[resource_request_id].cancel()
                 else:
-                    rospy.loginfo("TeleopPimp : captured teleopable robot [not available][%s]" % msg.rocon_uri)
+                    rospy.loginfo("TeleopPimp : captured teleopable robot [%s]" % msg.rocon_uri)
                 self.allocate_teleop_service_pair_server.reply(request_id, response)
         else:  # we're releasing
             if msg.rocon_uri in self.allocated_requests.keys():
