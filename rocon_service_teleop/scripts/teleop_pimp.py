@@ -154,10 +154,11 @@ class TeleopPimp:
                     rospy.logwarn("TeleopPimp : couldn't capture teleopable robot [timed out][%s]" % msg.rocon_uri)
                     self.requester.rset[resource_request_id].cancel()
                 else:
-                    rospy.loginfo("TeleopPimp : captured teleopable robot [%s]" % msg.rocon_uri)
+                    rospy.loginfo("TeleopPimp : captured teleopable robot [%s][%s]" % (msg.rocon_uri, self.allocated_requests[msg.rocon_uri]))
                 self.allocate_teleop_service_pair_server.reply(request_id, response)
         else:  # we're releasing
             if msg.rocon_uri in self.allocated_requests.keys():
+                rospy.loginfo("TeleopPimp : released teleopable robot [%s][%s]" % (msg.rocon_uri, self.allocated_requests[msg.rocon_uri].hex))
                 self.requester.rset[self.allocated_requests[msg.rocon_uri]].cancel()
                 self.requester.send_requests()
             response.result = True
