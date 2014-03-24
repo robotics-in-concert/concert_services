@@ -62,7 +62,7 @@ class TeleopPimp:
         ####################
         (self.service_name, self.service_description, self.service_id) = concert_service_utilities.get_service_info()
         try:
-            known_resources_topic_name = rocon_python_comms.find_topic('scheduler_msgs/KnownResources', timeout=rospy.rostime.Duration(5.0), unique=True)
+            known_resources_topic_name = rocon_python_comms.find_topic('scheduler_msgs/KnownResources', timeout=rospy.rostime.Duration(15.0), unique=True)
         except rocon_python_comms.NotFoundException as e:
             rospy.logerr("TeleopPimp : could not locate the scheduler's known resources topic [%s]" % str(e))
             sys.exit(1)
@@ -79,7 +79,7 @@ class TeleopPimp:
         self.allocated_requests = {}
 
         self.allocate_teleop_service_pair_server = rocon_python_comms.ServicePairServer('capture_teleop', self.ros_capture_teleop_callback, rocon_service_msgs.CaptureTeleopPair, use_threads=True)
-        self.allocation_timeout = 5.0  # seconds
+        self.allocation_timeout = 15.0  # seconds
 
     def setup_requester(self, uuid):
         topic = concert_msgs.Strings.SCHEDULER_REQUESTS
@@ -98,7 +98,7 @@ class TeleopPimp:
         # find difference of incoming and stored lists based on unique concert names
         diff = lambda l1, l2: [x for x in l1 if x.uri not in [l.uri for l in l2]]
         # get all currently invited teleopable robots
-        resources = [r for r in msg.resources if 'turtle_concert/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
+        resources = [r for r in msg.resources if 'turtlebot_concert/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
         self.lock.acquire()
         new_resources = diff(resources, self.teleopable_robots)
         lost_resources = diff(self.teleopable_robots, resources)
@@ -138,12 +138,12 @@ class TeleopPimp:
                 # send a request
                 resource = scheduler_msgs.Resource()
                 resource.id = unique_id.toMsg(unique_id.fromRandom())
-                resource.rapp = 'turtle_concert/teleop'
+                resource.rapp = 'turtlebot_concert/teleop'
                 resource.uri = msg.rocon_uri
                 resource_request_id = self.requester.new_request([resource])
                 self.pending_requests.append(resource_request_id)
                 self.requester.send_requests()
-                timeout_time = time.time() + 5.0
+                timeout_time = time.time() + 15.0
                 while not rospy.is_shutdown() and time.time() < timeout_time:
                     if resource_request_id not in self.pending_requests:
                         self.allocated_requests[msg.rocon_uri] = resource_request_id
