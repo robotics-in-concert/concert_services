@@ -19,13 +19,9 @@ catkin_package()
 
 install(
     PROGRAMS 
-        scripts/turtle_herder.py
-        scripts/hatchling.py
+        scripts/teleop_pimp.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     )
-
-install(DIRECTORY launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 install(DIRECTORY services
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
