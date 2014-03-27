@@ -82,9 +82,16 @@ class TeleopPimp:
         self.allocation_timeout = 5.0  # seconds
 
     def setup_requester(self, uuid):
-        topic = concert_msgs.Strings.SCHEDULER_REQUESTS
+        try:
+            # assuming all topics here come in as /x/y/z/topicname or /x/y/z/topicname_355af31d
+            topic_names = rocon_python_comms.find_topic('scheduler_msgs/SchedulerRequests', timeout=rospy.rostime.Duration(5.0), unique=False)
+            topic_name = min(topic_names, key=len)
+            #rospy.loginfo("Service : found scheduler [%s][%s]" % (topic_name))
+        except rocon_python_comms.NotFoundException:
+            rospy.logerr("TeleopPimp : couldn't find the concert scheduler topics, aborting")
+            return  # raise an exception here?
         frequency = rocon_scheduler_requests.common.HEARTBEAT_HZ
-        return rocon_scheduler_requests.Requester(self.requester_feedback, uuid, 0, topic, frequency)
+        return rocon_scheduler_requests.Requester(self.requester_feedback, uuid, 0, topic_name, frequency)
 
     def ros_scheduler_known_resources_callback(self, msg):
         '''
