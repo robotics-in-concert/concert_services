@@ -98,7 +98,7 @@ class TeleopPimp:
         # find difference of incoming and stored lists based on unique concert names
         diff = lambda l1, l2: [x for x in l1 if x.uri not in [l.uri for l in l2]]
         # get all currently invited teleopable robots
-        resources = [r for r in msg.resources if 'turtle_concert/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
+        resources = [r for r in msg.resources if 'rocon_apps/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
         self.lock.acquire()
         new_resources = diff(resources, self.teleopable_robots)
         lost_resources = diff(self.teleopable_robots, resources)
@@ -138,7 +138,7 @@ class TeleopPimp:
                 # send a request
                 resource = scheduler_msgs.Resource()
                 resource.id = unique_id.toMsg(unique_id.fromRandom())
-                resource.rapp = 'turtle_concert/teleop'
+                resource.rapp = 'rocon_apps/teleop'
                 resource.uri = msg.rocon_uri
                 resource_request_id = self.requester.new_request([resource])
                 self.pending_requests.append(resource_request_id)
