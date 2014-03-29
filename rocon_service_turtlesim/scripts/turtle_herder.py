@@ -76,6 +76,7 @@ class TurtleHerder:
         self._spawn_turtle_service_pair_server = rocon_python_comms.ServicePairServer('spawn', self._spawn_turtle_service, rocon_tutorial_msgs.SpawnTurtlePair, use_threads=True)
         # gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
+        rospy.wait_for_service(gateway_namespace + '/flip')
         self._gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
 
     def _kill_turtle_service(self, request_id, msg):

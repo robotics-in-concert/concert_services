@@ -93,7 +93,9 @@ class Hatchling:
         try:
             unused_response = self.gateway_flip_service(request)
         except rospy.ServiceException:  # communication failed
-            rospy.logerr("Hatchling : failed to send flip rules")
+            # usually because ros has shutdown, so just quietly pass on this
+            # could check for shutdown more specifically? or use the post shutdown hooks?
+            #rospy.logerr("Hatchling : failed to send flip rules")
             return
         except rospy.ROSInterruptException:
             rospy.loginfo("Hatchling : shutdown while contacting the gateway flip service")
