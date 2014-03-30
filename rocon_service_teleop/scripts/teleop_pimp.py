@@ -179,9 +179,12 @@ class TeleopPimp:
           @type dic { uuid.UUID : scheduler_msgs.ResourceRequest }
         '''
         for request_id, request in request_set.requests.iteritems():
-            if request_id in self.pending_requests:
-                if request.msg.status == scheduler_msgs.Request.GRANTED:
+            if request.msg.status == scheduler_msgs.Request.GRANTED:
+                if request_id in self.pending_requests:
                     self.pending_requests.remove(request_id)
+            elif request.msg.status == scheduler_msgs.Request.CLOSED:
+                self.pending_requests.remove(request_id)
+                self.granted_requests.remove(request_id)
 
     def cancel_all_requests(self):
         '''
