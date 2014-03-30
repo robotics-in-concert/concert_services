@@ -23,7 +23,7 @@ import threading
 
 import rospy
 import rocon_python_comms
-import rocon_tutorial_msgs.msg as rocon_tutorial_msgs
+import rocon_service_msgs.msg as rocon_service_msgs
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
 import std_msgs.msg as std_msgs
@@ -52,8 +52,8 @@ class Hatchling:
     def __init__(self):
         self.event_remote_controller_changed = threading.Event()
         # could delay this till we have a remote controller and 'sniff' instead of hardcoding
-        self.spawn_turtle = rocon_python_comms.ServicePairClient('spawn', rocon_tutorial_msgs.SpawnTurtlePair)
-        self.kill_turtle = rocon_python_comms.ServicePairClient('kill', rocon_tutorial_msgs.KillTurtlePair)
+        self.spawn_turtle = rocon_python_comms.ServicePairClient('spawn', rocon_service_msgs.SpawnTurtlePair)
+        self.kill_turtle = rocon_python_comms.ServicePairClient('kill', rocon_service_msgs.KillTurtlePair)
         # gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         self.gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
@@ -132,9 +132,9 @@ class Hatchling:
                         rospy.logerr("Hatchling: index error")
             else:  # see if we can register with turtlesim or not yet.
                 if interacting_with_remote_controller == rocon_app_manager_msgs.Constants.NO_REMOTE_CONTROLLER:
-                    response = self.kill_turtle(rocon_tutorial_msgs.KillTurtleRequest(self.name), timeout=rospy.Duration(4.0))
+                    response = self.kill_turtle(rocon_service_msgs.KillTurtleRequest(self.name), timeout=rospy.Duration(4.0))
                 else:
-                    response = self.spawn_turtle(rocon_tutorial_msgs.SpawnTurtleRequest(self.name), timeout=rospy.Duration(4.0))
+                    response = self.spawn_turtle(rocon_service_msgs.SpawnTurtleRequest(self.name), timeout=rospy.Duration(4.0))
                 if response:  # didn't time out, probably waiting for the flips to arrive.
                     self.remote_controller = interacting_with_remote_controller
                     interacting_with_remote_controller = None
