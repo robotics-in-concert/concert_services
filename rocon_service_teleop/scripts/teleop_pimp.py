@@ -78,7 +78,7 @@ class TeleopPimp:
         self.allocated_requests = {}
 
         self.allocate_teleop_service_pair_server = rocon_python_comms.ServicePairServer('capture_teleop', self.ros_capture_teleop_callback, rocon_service_msgs.CaptureTeleopPair, use_threads=True)
-        self.allocation_timeout = 5.0  # seconds
+        self.allocation_timeout = rospy.get_param('allocation_timeout', 15.0)  # seconds
 
     def setup_requester(self, uuid):
         try:
@@ -147,7 +147,7 @@ class TeleopPimp:
                 resource_request_id = self.requester.new_request([resource])
                 self.pending_requests.append(resource_request_id)
                 self.requester.send_requests()
-                timeout_time = time.time() + 5.0
+                timeout_time = time.time() + self.allocation_timeout 
                 while not rospy.is_shutdown() and time.time() < timeout_time:
                     if resource_request_id not in self.pending_requests:
                         self.allocated_requests[msg.rocon_uri] = resource_request_id
