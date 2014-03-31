@@ -3,10 +3,12 @@
 	<name>rocon_service_turtlesim</name>
 	<comment></comment>
 	<projects>
+		<project>gateway_msgs</project>
 		<project>rocon_gateway</project>
 		<project>rocon_gateway_utils</project>
+		<project>rocon_launch</project>
 		<project>rocon_python_comms</project>
-		<project>rocon_tutorial_msgs</project>
+		<project>rocon_service_msgs</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

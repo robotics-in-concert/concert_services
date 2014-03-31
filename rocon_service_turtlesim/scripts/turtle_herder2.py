@@ -28,12 +28,13 @@ import tempfile
 import math
 import random
 import copy
+import time
 
+import rocon_launch
 import rospy
 import rocon_gateway_utils
 import rocon_python_utils.ros
 import turtlesim.srv as turtlesim_srvs
-import rocon_tutorial_msgs.srv as rocon_tutorial_srvs
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
 
@@ -42,7 +43,7 @@ import gateway_msgs.srv as gateway_srvs
 ##############################################################################
 
 
-def prepare_rocon_launch_text(self, turtles):
+def prepare_rocon_launch_text(turtles):
     port = 11
     launch_text = '<concert>\n'
     for name in turtles:
@@ -78,8 +79,8 @@ class TurtleHerder:
         'turtles',  # Dictionary of string : concert_msgs.RemoconApp[]
         '_kill_turtle_service_client',
         '_spawn_turtle_service_client',
-        '_kill_turtle_service',
-        '_spawn_turtle_service',
+#        '_kill_turtle_service',
+#        '_spawn_turtle_service',
         '_gateway_flip_service',
         '_process_info'
     ]
@@ -101,86 +102,105 @@ class TurtleHerder:
             rospy.loginfo("Turtle Herder : shutdown while contacting the internal kill turtle service")
             return
         # herding frontend
-        self._kill_turtle_service = rospy.Service('~kill', rocon_tutorial_srvs.KillTurtle, self._kill_turtle_service)
-        self._spawn_turtle_service = rospy.Service('~spawn', rocon_tutorial_srvs.SpawnTurtle, self._spawn_turtle_service)
+#        self._kill_turtle_service = rospy.Service('~kill', rocon_service_srvs.KillTurtle, self._kill_turtle_service)
+#        self._spawn_turtle_service = rospy.Service('~spawn', rocon_service_srvs.SpawnTurtle, self._spawn_turtle_service)
         # gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         rospy.wait_for_service(gateway_namespace + '/flip')
         self._gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
 
-    def _kill_turtle_service(self, req):
-        '''
-          @param msg
-          @type rocon_tutorial_srvs.KillTurtleRequest
-        '''
-        internal_service_request = turtlesim_srvs.KillRequest(msg.name)
-        try:
-            unused_internal_service_response = self._kill_turtle_service_client(internal_service_request)
-            self.turtles.remove(req.name)
-        except rospy.ServiceException:  # communication failed
-            rospy.logerr("Turtle Herder : failed to contact the internal kill turtle service")
-        except rospy.ROSInterruptException:
-            rospy.loginfo("Turtle Herder : shutdown while contacting the internal kill turtle service")
-            return
-        self._kill_turtle_service_pair_server.reply(rocon_tutorial_srvs.KillTurtleResponse())
-        self._send_flip_rules_request(name=req.name, cancel=True)
-
-    def _spawn_turtle_service(self, req):
-        '''
-          @param msg
-          @type rocon_tutorial_srvs.SpawnTurtleRequest
-        '''
-        response = rocon_tutorial_srvs.SpawnTurtleResponse()
-        response.name = ''
-        # Unique name
-        name = req.name
-        name_extension = ''
-        count = 0
-        while name + name_extension in self.turtles:
-            name_extension = '_' + str(count)
-            count = count + 1
-        name = name + name_extension
-
-        internal_service_request = turtlesim_srvs.SpawnRequest(
-                                            random.uniform(3.5, 6.5),
-                                            random.uniform(3.5, 6.5),
-                                            random.uniform(0.0, 2.0 * math.pi),
-                                            name)
-        try:
-            unused_internal_service_response = self._spawn_turtle_service_client(internal_service_request)
-            self.turtles.append(name)
-        except rospy.ServiceException:  # communication failed
-            rospy.logerr("TurtleHerder : failed to contact the internal spawn turtle service")
-            return response
-        except rospy.ROSInterruptException:
-            rospy.loginfo("TurtleHerder : shutdown while contacting the internal spawn turtle service")
-            return response
-        self._send_flip_rules_request(name=name, cancel=False)
-        response.name = name
-        return response
+#     def _kill_turtle_service(self, req):
+#         '''
+#           @param msg
+#           @type rocon_service_srvs.KillTurtleRequest
+#         '''
+#         internal_service_request = turtlesim_srvs.KillRequest(msg.name)
+#         try:
+#             unused_internal_service_response = self._kill_turtle_service_client(internal_service_request)
+#             self.turtles.remove(req.name)
+#         except rospy.ServiceException:  # communication failed
+#             rospy.logerr("Turtle Herder : failed to contact the internal kill turtle service")
+#         except rospy.ROSInterruptException:
+#             rospy.loginfo("Turtle Herder : shutdown while contacting the internal kill turtle service")
+#             return
+#         self._kill_turtle_service_pair_server.reply(rocon_service_srvs.KillTurtleResponse())
+#         self._send_flip_rules_request(name=req.name, cancel=True)
+# 
+#     def _spawn_turtle_service(self, req):
+#         '''
+#           @param msg
+#           @type rocon_service_srvs.SpawnTurtleRequest
+#         '''
+#         response = rocon_service_srvs.SpawnTurtleResponse()
+#         response.name = ''
+#         # Unique name
+#         name = req.name
+#         name_extension = ''
+#         count = 0
+#         while name + name_extension in self.turtles:
+#             name_extension = '_' + str(count)
+#             count = count + 1
+#         name = name + name_extension
+# 
+#         internal_service_request = turtlesim_srvs.SpawnRequest(
+#                                             random.uniform(3.5, 6.5),
+#                                             random.uniform(3.5, 6.5),
+#                                             random.uniform(0.0, 2.0 * math.pi),
+#                                             name)
+#         try:
+#             unused_internal_service_response = self._spawn_turtle_service_client(internal_service_request)
+#             self.turtles.append(name)
+#         except rospy.ServiceException:  # communication failed
+#             rospy.logerr("TurtleHerder : failed to contact the internal spawn turtle service")
+#             return response
+#         except rospy.ROSInterruptException:
+#             rospy.loginfo("TurtleHerder : shutdown while contacting the internal spawn turtle service")
+#             return response
+#         self._send_flip_rules_request(name=name, cancel=False)
+#         response.name = name
+#         return response
 
     def spawn_turtles(self, turtles):
-        turtle_names = []
+        # establish names
         for turtle_name in turtles:
             name_extension = ''
             count = 0
             while turtle_name + name_extension in self.turtles:
                 name_extension = '_' + str(count)
                 count = count + 1
-            turtle_names.append(turtle_name + name_extension)
+            self.turtles.append(turtle_name + name_extension)
 
+        # spawn the turtle concert clients
         temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
-        rocon_launch_text = self._prepare_rocon_launch_text(turtles)
+        rocon_launch_text = prepare_rocon_launch_text(turtles)
         print("%s" % rocon_launch_text)
         temp.write(rocon_launch_text)
         temp.close()  # unlink it later
-        print("Starting process %s" % ['rocon_launch', temp.name, '--screen'])
+        rospy.loginfo("TurtleHerder : starting process %s" % ['rocon_launch', temp.name, '--screen'])
         if rocon_python_utils.ros.get_rosdistro() == 'hydro':
             process = subprocess.Popen(['rocon_launch', '--gnome', temp.name, '--screen'])
         else:
             process = subprocess.Popen(['rocon_launch', temp.name, '--screen'])
-        self.turtles.extend(turtle_names)
         self._process_info.append(ProcessInfo(process, temp))
+
+        # create the turtles in turtlesim
+        for name in self.turtles:
+            internal_service_request = turtlesim_srvs.SpawnRequest(
+                                                random.uniform(3.5, 6.5),
+                                                random.uniform(3.5, 6.5),
+                                                random.uniform(0.0, 2.0 * math.pi),
+                                                name)
+            try:
+                unused_internal_service_response = self._spawn_turtle_service_client(internal_service_request)
+                self.turtles.append(name)
+            except rospy.ServiceException:  # communication failed
+                rospy.logerr("TurtleHerder : failed to contact the internal spawn turtle service")
+            except rospy.ROSInterruptException:
+                rospy.loginfo("TurtleHerder : shutdown while contacting the internal spawn turtle service")
+
+        # flip rules
+        for name in self.turtles:
+            self._send_flip_rules_request(name=name, cancel=False)
 
     def _send_flip_rules_request(self, name, cancel):
         rules = []
@@ -211,6 +231,14 @@ class TurtleHerder:
             return
 
     def shutdown(self):
+        """
+          - Send unflip requests  (this should go in a service manager callable ros callback)
+          - Cleanup turtles on the turtlesim canvas.
+          - Shutdown spawned terminals
+
+          Cleaning turtles is probably not really important since
+          we always shutdown turtlesim and turtle_herder together.
+        """
         for name in self.turtles:
             try:
                 unused_internal_service_response = self._kill_turtle_service_client(name)
@@ -219,17 +247,29 @@ class TurtleHerder:
             except rospy.ROSInterruptException:
                 break  # quietly fail
 
-    def signal_handler(self, sig, frame):
         for process_info in self._process_info:
             print("Pid: %s" % process_info.process.pid)
-            process_info.process.terminate()
+            roslaunch_pids = rocon_launch.get_roslaunch_pids(process_info.process.pid)
+            print("Roslaunch Pids: %s" % roslaunch_pids)
+        # don't need to tell the roslaunch processes to interrupt since we're
+        # letting ros pass through that SIGINT everywhere. If we were to use a
+        # signal_handler instead we probably would have to.
+        # Nonetheless, still wait for the boys
+        for pid in roslaunch_pids:
+            print("Waiting on roslaunch pid %s" % pid)
+            result = rocon_python_utils.system.wait_pid(process_info.process.pid)
+            print("Pid %s exited with result %s" % (pid, result))
+#         time.sleep(1)  # Do we need this?
+        for process_info in self._process_info:
+            print("Now killing konsoles")
             try:
-                #process_info.process.terminate()
-                process_info.process.send_signal(signal.SIGHUP)
+                process_info.process.terminate()
             except OSError:
-                print("OSERROR on SIGHUP")
+                # process had already died naturally
+                pass
+        for process_info in self._process_info:
+            print("Unlinking %s" % process_info.temp_file.name)
             os.unlink(process_info.temp_file.name)
-            #wait_pid(pid)
 
 ##############################################################################
 # Launch point
@@ -240,14 +280,6 @@ if __name__ == '__main__':
     rospy.init_node('turtle_herder')
 
     turtle_herder = TurtleHerder()
-    signal.signal(signal.SIGINT, turtle_herder.signal_handler)
     turtle_herder.spawn_turtles(['kobuki', 'guimul'])
-#    rospy.wait_for_service('~spawn')
-#    spawn_turtle = rospy.Service('~spawn', rocon_tutorial_srvs.SpawnTurtle)
-#    rospy.rostime.wallsleep(0.5)
-#    response = spawn_turtle(rocon_tutorial_srvs.SpawnTurtleRequest('kobuki'), timeout=rospy.Duration(3.0))
-#    print("Response: %s" % response)
-#    response = spawn_turtle(rocon_tutorial_srvs.SpawnTurtleRequest('guimul'), timeout=rospy.Duration(3.0))
-#    print("Response: %s" % response)
     rospy.spin()
     turtle_herder.shutdown()

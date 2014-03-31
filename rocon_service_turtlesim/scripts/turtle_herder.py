@@ -29,7 +29,7 @@ import rospy
 import rocon_python_comms
 import rocon_gateway_utils
 import turtlesim.srv as turtlesim_srvs
-import rocon_tutorial_msgs.msg as rocon_tutorial_msgs
+import rocon_service_msgs.msg as rocon_service_msgs
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
 
@@ -72,8 +72,8 @@ class TurtleHerder:
             return
         # herding frontend
         # we relay services inside the service pair, so make sure we use threads so it doesn't hold up requests from multiple sources
-        self._kill_turtle_service_pair_server = rocon_python_comms.ServicePairServer('kill', self._kill_turtle_service, rocon_tutorial_msgs.KillTurtlePair, use_threads=True)
-        self._spawn_turtle_service_pair_server = rocon_python_comms.ServicePairServer('spawn', self._spawn_turtle_service, rocon_tutorial_msgs.SpawnTurtlePair, use_threads=True)
+        self._kill_turtle_service_pair_server = rocon_python_comms.ServicePairServer('kill', self._kill_turtle_service, rocon_service_msgs.KillTurtlePair, use_threads=True)
+        self._spawn_turtle_service_pair_server = rocon_python_comms.ServicePairServer('spawn', self._spawn_turtle_service, rocon_service_msgs.SpawnTurtlePair, use_threads=True)
         # gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         rospy.wait_for_service(gateway_namespace + '/flip')
@@ -86,7 +86,7 @@ class TurtleHerder:
           @param msg
           @type ServiceRequest
         '''
-        response = rocon_tutorial_msgs.KillTurtleResponse()
+        response = rocon_service_msgs.KillTurtleResponse()
         internal_service_request = turtlesim_srvs.KillRequest(msg.name)
         try:
             unused_internal_service_response = self._kill_turtle_service_client(internal_service_request)
@@ -129,7 +129,7 @@ class TurtleHerder:
         except rospy.ROSInterruptException:
             rospy.loginfo("TurtleHerder : shutdown while contacting the internal spawn turtle service")
             return
-        response = rocon_tutorial_msgs.SpawnTurtleResponse()
+        response = rocon_service_msgs.SpawnTurtleResponse()
         response.name = name
         self._spawn_turtle_service_pair_server.reply(request_id, response)
         self._send_flip_rules_request(name=name, cancel=False)
@@ -180,11 +180,11 @@ if __name__ == '__main__':
     rospy.init_node('turtle_herder')
 
     turtle_herder = TurtleHerder()
-#     spawn_turtle = rocon_python_comms.ServicePairClient('spawn', rocon_tutorial_msgs.SpawnTurtlePair)
+#     spawn_turtle = rocon_python_comms.ServicePairClient('spawn', rocon_service_msgs.SpawnTurtlePair)
 #     rospy.rostime.wallsleep(0.5)
-#     response = spawn_turtle(rocon_tutorial_msgs.SpawnTurtleRequest('kobuki'), timeout=rospy.Duration(3.0))
+#     response = spawn_turtle(rocon_service_msgs.SpawnTurtleRequest('kobuki'), timeout=rospy.Duration(3.0))
 #     print("Response: %s" % response)
-#     response = spawn_turtle(rocon_tutorial_msgs.SpawnTurtleRequest('guimul'), timeout=rospy.Duration(3.0))
+#     response = spawn_turtle(rocon_service_msgs.SpawnTurtleRequest('guimul'), timeout=rospy.Duration(3.0))
 #     print("Response: %s" % response)
     rospy.spin()
     turtle_herder.shutdown()
