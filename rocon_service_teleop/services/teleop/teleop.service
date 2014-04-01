@@ -6,4 +6,3 @@ launcher_type: roslaunch
 launcher: rocon_service_teleop/teleop
 icon: rocon_service_teleop/teleop.png
 interactions: rocon_service_teleop/teleop
-parameters: rocon_service_teleop/teleop
