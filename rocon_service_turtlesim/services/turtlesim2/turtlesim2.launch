@@ -1,4 +1,5 @@
 <launch>
+<<<<<<< HEAD
   <node pkg="turtlesim" type="turtlesim_node" name="turtlesim" required="true">
     <remap from="kill" to="internal/kill"/>
     <remap from="spawn" to="internal/spawn"/>
@@ -9,4 +10,8 @@
     <remap from="turtle_herder/internal/kill" to="internal/kill"/>
     <remap from="turtle_herder/internal/spawn" to="internal/spawn"/>
   </node>
+=======
+  <node pkg="turtlesim" type="turtlesim_node" name="turtlesim" required="true"/>
+  <node pkg="rocon_service_turtlesim" type="turtle_herder2.py" name="turtle_herder"/>
+>>>>>>> indigo
 </launch>
