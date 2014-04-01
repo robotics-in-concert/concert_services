@@ -1,4 +1,0 @@
-<launch>
-  <node pkg="turtlesim" type="turtlesim_node" name="turtlesim" required="true"/>
-  <node pkg="rocon_service_turtlesim" type="turtle_herder2.py" name="turtle_herder"/>
-</launch>

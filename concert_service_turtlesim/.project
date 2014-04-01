@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>concert_service_turtlesim</name>
+	<comment></comment>
+	<projects>
+		<project>concert_service_utilities</project>
+		<project>gateway_msgs</project>
+		<project>rocon_console</project>
+		<project>rocon_gateway</project>
+		<project>rocon_gateway_utils</project>
+		<project>rocon_launch</project>
+		<project>rocon_python_comms</project>
+		<project>rocon_python_utils</project>
+		<project>rocon_service_msgs</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.python.pydev.PyDevBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.python.pydev.pythonNature</nature>
+	</natures>
+</projectDescription>
