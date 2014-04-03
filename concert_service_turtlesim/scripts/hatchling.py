@@ -55,7 +55,7 @@ class Hatchling:
         self.spawn_turtle = rocon_python_comms.ServicePairClient('spawn', concert_service_msgs.SpawnTurtlePair)
         self.kill_turtle = rocon_python_comms.ServicePairClient('kill', concert_service_msgs.KillTurtlePair)
         # gateway
-        gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
+        gateway_namespace = rocon_gateway_utils.resolve_local_gateway(timeout=rospy.rostime.Duration(10.0))
         self.gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
         self.name = rocon_gateway_utils.resolve_gateway_info(gateway_namespace).name
         # app manager
