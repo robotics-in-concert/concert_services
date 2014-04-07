@@ -1,5 +1,5 @@
 <!--
-  Launches the infrastructure running on a robot (turtle). 
+  Launches the infrastructure running on a robot. 
  -->
 <launch>
     <arg name="robot_name" default="robot"/>
