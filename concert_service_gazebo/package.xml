@@ -32,9 +32,11 @@
 
   <run_depend>gazebo_ros</run_depend>
   <run_depend>turtlebot_simulator</run_depend>
+  <run_depend>segbot_gazebo</run_depend>
 
   <export>
-    <concert_service>services/gazebo/gazebo.service</concert_service>
+    <!-- <concert_service>services/turtlebot/turtlebot.service</concert_service> -->
+    <concert_service>services/segbot/turtlebot.service</concert_service>
   </export>
 
 </package>

@@ -19,7 +19,8 @@ catkin_package()
 
 install(
     PROGRAMS 
-        scripts/gazebo_turtlebot_manager
+    #        scripts/gazebo_turtlebot_manager
+             scripts/gazebo_segbot_manager
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     )
 
