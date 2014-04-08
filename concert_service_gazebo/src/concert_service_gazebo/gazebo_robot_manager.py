@@ -92,8 +92,7 @@ class GazeboRobotManager:
         """
         for robot in robots:
             try:
-                robot_pose = get_pose_from_tuple(robot["location"])
-                self.robot_manager.spawn_robot(robot["name"], robot_pose)
+                self.robot_manager.spawn_robot(robot["name"], robot["location"])
                 self.robots.append(robot["name"])
             # TODO add failure exception
             except rospy.ROSInterruptException:
@@ -223,19 +222,3 @@ class GazeboRobotManager:
             except OSError:
                 pass
 
-# ##############################################################################
-# # Launch point
-# ##############################################################################
-# 
-# if __name__ == '__main__':
-# 
-#     rospy.init_node('turtle_herder')
-#     (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
-#     turtles = rospy.get_param('/services/' + service_name + '/turtles', [])
-#     rospy.logwarn("TurtleHerder: spawning turtles: %s" % turtles)
-# 
-#     turtle_herder = TurtleHerder()
-#     turtle_herder.spawn_turtles(turtles)
-#     while not rospy.is_shutdown() and not turtle_herder.is_disabled:
-#         rospy.sleep(0.3)
-#     turtle_herder.shutdown()

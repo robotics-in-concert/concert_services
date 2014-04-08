@@ -1,3 +1,42 @@
-robot_manager.spawn_robot(name, geometry_msgs/Pose)
+#!/usr/bin/env python
+#
+# License: BSD
+#   https://raw.github.com/robotics-in-concert/concert_services/license/LICENSE
+#
+
+class SegbotManager:
+
+    def spawn_robot(self, name, tuple):
+
+
+    def _generate_spawn_robot_launch_script(self, name, tuple):
+        launch_text = '<launch>\n'
+        launch_text += '  <group ns="%s">\n' % name
+        launch_text += '    <arg name="turtle_name" value="%s"/>\n' % name
+        launch_text += '    <arg name="turtle_concert_whitelist" value="Turtle Concert;Turtle Teleop Concert;Concert Tutorial"/>\n'
+        launch_text += '    <arg name="turtle_rapp_whitelist" value="[rocon_apps, turtle_concert]"/>\n'
+        launch_text += '</launch>\n'
+        return launch_text
+
+    def delete_robot(self, name):
+
+
 robot_manager.prepare_rocon_launch_text(names)
 robot_manager.get_flip_rule_list(name)
+
+# ##############################################################################
+# # Launch point
+# ##############################################################################
+# 
+# if __name__ == '__main__':
+# 
+#     rospy.init_node('turtle_herder')
+#     (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
+#     turtles = rospy.get_param('/services/' + service_name + '/turtles', [])
+#     rospy.logwarn("TurtleHerder: spawning turtles: %s" % turtles)
+# 
+#     turtle_herder = TurtleHerder()
+#     turtle_herder.spawn_turtles(turtles)
+#     while not rospy.is_shutdown() and not turtle_herder.is_disabled:
+#         rospy.sleep(0.3)
+#     turtle_herder.shutdown()
