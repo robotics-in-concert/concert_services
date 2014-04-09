@@ -27,7 +27,6 @@ import signal
 import tempfile
 import subprocess
 
-import concert_service_utilities
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
 import rocon_launch
