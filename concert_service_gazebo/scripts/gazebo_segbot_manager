@@ -10,7 +10,7 @@ import rospy
 import subprocess
 import tempfile
 
-from gazebo_msgs.msg import DeleteModel, DeleteModelRequest
+from gazebo_msgs.srv import DeleteModel, DeleteModelRequest
 
 from concert_service_gazebo import GazeboRobotManager 
 
@@ -32,12 +32,12 @@ def generate_spawn_robot_launch_script(name, location):
     launch_text += '    <include file="$(find segbot_gazebo)/launch/segbot_mobile_base.launch">'
     launch_text += '      <arg name="robotid" value="%s"/>\n' % name
     launch_text += '      <arg name="tf_prefix" value="/%s"/>\n' % name
-    launch_text += '      <arg name="x" value="/%s"/>\n' % location[0]
-    launch_text += '      <arg name="y" value="/%s"/>\n' % location[1]
-    launch_text += '      <arg name="z" value="/%s"/>\n' % location[2]
-    launch_text += '      <arg name="roll" value="/%s"/>\n' % location[3]
-    launch_text += '      <arg name="pitch" value="/%s"/>\n' % location[4]
-    launch_text += '      <arg name="yaw" value="/%s"/>\n' % location[5]
+    launch_text += '      <arg name="x" value="%s"/>\n' % location[0]
+    launch_text += '      <arg name="y" value="%s"/>\n' % location[1]
+    launch_text += '      <arg name="z" value="%s"/>\n' % location[2]
+    launch_text += '      <arg name="roll" value="%s"/>\n' % location[3]
+    launch_text += '      <arg name="pitch" value="%s"/>\n' % location[4]
+    launch_text += '      <arg name="yaw" value="%s"/>\n' % location[5]
     launch_text += '    </include>\n'
     launch_text += '  </group>\n'
     launch_text += '</launch>\n'
@@ -57,36 +57,36 @@ def start_roslaunch_process(launch_script):
     except KeyError:
         pass
     process = subprocess.Popen(command_args, env=roslaunch_env)
-    # TODO probably swap with process.poll to prevent indefinite wait
-    process.wait()
+    return process
 
 class SegbotManager:
 
     def __init__(self):
         rospy.wait_for_service('/gazebo/delete_model')
         self.delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+        self.processes = {}
 
     def spawn_robot(self, name, position_vector):
         reformatted_position_vector = reformat_position_vector(position_vector)
         launch_script = generate_spawn_robot_launch_script(name, reformatted_position_vector)
-        start_roslaunch_process(launch_script)
+        self.processes[name] = start_roslaunch_process(launch_script)
 
     def delete_robot(self, name):
         delete_service_req = DeleteModelRequest(name)
         try:
+            self.processes[name].terminate()
             self.delete_model(delete_service_req)
         except rospy.ServiceException:  # communication failed
             rospy.logerr("GazeboSegbotManager : unable to delete model %s" % name)
-            continue
 
     def prepare_rocon_launch_text(self, turtles):
         port = 11
         launch_text = '<concert>\n'
         for name in turtles:
-            launch_text += '  <launch title="%s:114%s" package="concert_service_gazebo" name="turtle2.launch" port="114%s">\n' % (name, str(port), str(port))
+            launch_text += '  <launch title="%s:114%s" package="concert_service_gazebo" name="robot.launch" port="114%s">\n' % (name, str(port), str(port))
             launch_text += '    <arg name="robot_name" value="%s"/>\n' % name
-            launch_text += '    <arg name="turtle_concert_whitelist" value="Gazebo Concert;Concert Tutorial"/>\n'
-            launch_text += '    <arg name="turtle_rapp_whitelist" value="[rocon_apps, bwi_orchestration_rapps]"/>\n'
+            launch_text += '    <arg name="robot_concert_whitelist" value="Gazebo Concert;Concert Tutorial"/>\n'
+            launch_text += '    <arg name="robot_rapp_whitelist" value="[rocon_apps, bwi_orchestration_rapps]"/>\n'
             launch_text += '  </launch>\n'
             port = port + 1
         launch_text += '</concert>\n'
@@ -101,8 +101,9 @@ class SegbotManager:
 
 if __name__ == '__main__':
 
-    rospy.init_node('turtle_herder')
-    (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
+    rospy.init_node('gazebo_segbot_manager')
+    # (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
+    service_name = 'test'
     segbots = rospy.get_param('/services/' + service_name + '/segbots', [])
     rospy.logwarn("GazeboSegbotManager: spawning segbots : %s" % segbots)
 
