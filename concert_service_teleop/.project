@@ -3,6 +3,7 @@
 	<name>concert_service_teleop</name>
 	<comment></comment>
 	<projects>
+		<project>concert_scheduler_requests</project>
 		<project>concert_schedulers</project>
 		<project>concert_service_msgs</project>
 		<project>concert_service_utilities</project>
