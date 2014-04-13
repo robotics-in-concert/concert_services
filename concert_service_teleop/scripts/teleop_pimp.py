@@ -43,6 +43,7 @@ class TeleopPimp:
     __slots__ = [
         'service_name',
         'service_description',
+        'service_priority',
         'service_id',
         'scheduler_resources_subscriber',
         'list_available_teleops_server',
@@ -59,7 +60,7 @@ class TeleopPimp:
         ####################
         # Discovery
         ####################
-        (self.service_name, self.service_description, self.service_id) = concert_service_utilities.get_service_info()
+        (self.service_name, self.service_description, self.service_priority, self.service_id) = concert_service_utilities.get_service_info()
         try:
             known_resources_topic_name = rocon_python_comms.find_topic('scheduler_msgs/KnownResources', timeout=rospy.rostime.Duration(5.0), unique=True)
         except rocon_python_comms.NotFoundException as e:
@@ -144,10 +145,10 @@ class TeleopPimp:
                 resource.id = unique_id.toMsg(unique_id.fromRandom())
                 resource.rapp = 'rocon_apps/teleop'
                 resource.uri = msg.rocon_uri
-                resource_request_id = self.requester.new_request([resource])
+                resource_request_id = self.requester.new_request([resource], priority=self.service_priority)
                 self.pending_requests.append(resource_request_id)
                 self.requester.send_requests()
-                timeout_time = time.time() + self.allocation_timeout 
+                timeout_time = time.time() + self.allocation_timeout
                 while not rospy.is_shutdown() and time.time() < timeout_time:
                     if resource_request_id not in self.pending_requests:
                         self.allocated_requests[msg.rocon_uri] = resource_request_id

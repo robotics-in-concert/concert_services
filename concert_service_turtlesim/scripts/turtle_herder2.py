@@ -270,7 +270,7 @@ class TurtleHerder:
 if __name__ == '__main__':
 
     rospy.init_node('turtle_herder')
-    (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
+    (service_name, unused_service_description, service_priority, unused_service_id) = concert_service_utilities.get_service_info()
     turtles = rospy.get_param('/services/' + service_name + '/turtles', [])
     rospy.logwarn("TurtleHerder: spawning turtles: %s" % turtles)
 
