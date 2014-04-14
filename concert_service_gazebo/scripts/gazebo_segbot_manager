@@ -10,6 +10,7 @@ import rospy
 import subprocess
 import tempfile
 
+from gateway_msgs.msg import Rule, ConnectionType
 from gazebo_msgs.srv import DeleteModel, DeleteModelRequest
 
 from concert_service_gazebo import GazeboRobotManager 
@@ -93,7 +94,14 @@ class SegbotManager:
         return launch_text
 
     def get_flip_rule_list(self, name):
-        return []
+        return [Rule(ConnectionType.SUBSCRIBER, '/' + name + '/cmd_vel', None),
+                Rule(ConnectionType.PUBLISHER, '/' + name + '/odom', None),
+                Rule(ConnectionType.PUBLISHER, '/' + name + '/scan_filtered', None),
+                Rule(ConnectionType.SERVICE, '/static_map', None), #TODO: Shouldn't be hardcoded
+                Rule(ConnectionType.PUBLISHER, '/map', None), #TODO: Shouldn't be hardcoded
+                Rule(ConnectionType.PUBLISHER, '/tf', None), 
+                Rule(ConnectionType.PUBLISHER, '/tf_static', None),
+                Rule(ConnectionType.PUBLISHER, '/clock', None)]
 
 ##############################################################################
 # Launch point
@@ -105,7 +113,7 @@ if __name__ == '__main__':
     # (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
     service_name = 'test'
     segbots = rospy.get_param('/services/' + service_name + '/segbots', [])
-    rospy.logwarn("GazeboSegbotManager: spawning segbots : %s" % segbots)
+    rospy.loginfo("GazeboSegbotManager: spawning segbots : %s" % segbots)
 
     segbot_manager = SegbotManager()
     gazebo_segbot_manager = GazeboRobotManager(segbot_manager)
