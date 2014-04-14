@@ -27,10 +27,11 @@ def reformat_position_vector(position_vector):
                 position_vector[2]]
     return [position_vector[x] if x < len(position_vector) else 0.0 for x in range(6)]
 
-def generate_spawn_robot_launch_script(name, location):
+def generate_spawn_robot_launch_script(name, gazebo_name, location):
     launch_text = '<launch>\n'
     launch_text += '  <group ns="%s">\n' % name
     launch_text += '    <include file="$(find segbot_gazebo)/launch/segbot_mobile_base.launch">'
+    launch_text += '      <arg name="world" value="%s"/>\n' % gazebo_name
     launch_text += '      <arg name="robotid" value="%s"/>\n' % name
     launch_text += '      <arg name="tf_prefix" value="/%s"/>\n' % name
     launch_text += '      <arg name="x" value="%s"/>\n' % location[0]
@@ -62,14 +63,15 @@ def start_roslaunch_process(launch_script):
 
 class SegbotManager:
 
-    def __init__(self):
-        rospy.wait_for_service('/gazebo/delete_model')
-        self.delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+    def __init__(self, namespace = '/'):
+        rospy.wait_for_service(namespace + 'gazebo/delete_model')
+        self.delete_model = rospy.ServiceProxy(namespace + 'gazebo/delete_model', DeleteModel)
+        self.namespace = namespace
         self.processes = {}
 
     def spawn_robot(self, name, position_vector):
         reformatted_position_vector = reformat_position_vector(position_vector)
-        launch_script = generate_spawn_robot_launch_script(name, reformatted_position_vector)
+        launch_script = generate_spawn_robot_launch_script(name, self.namespace + '/gazebo', reformatted_position_vector)
         self.processes[name] = start_roslaunch_process(launch_script)
 
     def delete_robot(self, name):
@@ -110,11 +112,11 @@ class SegbotManager:
 if __name__ == '__main__':
 
     rospy.init_node('gazebo_segbot_manager')
-    (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
+    (service_name, unused_service_description, unused_service_id, unused_key) = concert_service_utilities.get_service_info()
     segbots = rospy.get_param('/services/' + service_name + '/segbots', [])
     rospy.loginfo("GazeboSegbotManager: spawning segbots : %s" % segbots)
 
-    segbot_manager = SegbotManager()
+    segbot_manager = SegbotManager('/services/' + service_name + '/')
     gazebo_segbot_manager = GazeboRobotManager(segbot_manager)
     gazebo_segbot_manager.spawn_robots(segbots)
     while not rospy.is_shutdown() and not gazebo_segbot_manager.is_disabled:

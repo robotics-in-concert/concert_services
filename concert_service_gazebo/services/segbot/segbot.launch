@@ -1,6 +1,7 @@
 <launch>
 
   <!-- launch an empty environment -->
+  <param name="/use_sim_time" value="true" />
   <include file="$(find gazebo_ros)/launch/empty_world.launch" />
 
   <!-- launch the gazebo robot spawner -->

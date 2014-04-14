@@ -36,7 +36,7 @@
 
   <export>
     <!-- <concert_service>services/turtlebot/turtlebot.service</concert_service> -->
-    <concert_service>services/segbot/turtlebot.service</concert_service>
+    <concert_service>services/segbot/segbot.service</concert_service>
   </export>
 
 </package>
