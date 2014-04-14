@@ -18,7 +18,6 @@
   <run_depend>concert_scheduler_requests</run_depend>
   <run_depend>concert_service_utilities</run_depend>
   <run_depend>rocon_python_comms</run_depend>
-  <run_depend>rocon_scheduler_requests</run_depend>
   <run_depend>concert_service_msgs</run_depend>
   <run_depend>rocon_std_msgs</run_depend>
   <run_depend>scheduler_msgs</run_depend>
