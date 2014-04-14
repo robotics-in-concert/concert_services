@@ -110,8 +110,7 @@ class SegbotManager:
 if __name__ == '__main__':
 
     rospy.init_node('gazebo_segbot_manager')
-    # (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
-    service_name = 'test'
+    (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
     segbots = rospy.get_param('/services/' + service_name + '/segbots', [])
     rospy.loginfo("GazeboSegbotManager: spawning segbots : %s" % segbots)
 
