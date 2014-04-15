@@ -17,16 +17,5 @@ catkin_python_setup()
 # Installs
 ##############################################################################
 
-
-install(
-    PROGRAMS 
-    #        scripts/gazebo_turtlebot_manager
-             scripts/gazebo_segbot_manager
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-    )
-
 install(DIRECTORY launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
-install(DIRECTORY services
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
