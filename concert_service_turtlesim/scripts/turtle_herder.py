@@ -24,6 +24,7 @@
 import math
 import random
 import copy
+import threading
 
 import rospy
 import rocon_python_comms
@@ -52,11 +53,15 @@ class TurtleHerder:
         '_kill_turtle_service_client',
         '_kill_turtle_service_pair_server',
         '_spawn_turtle_service_pair_server',
-        '_gateway_flip_service'
+        '_gateway_flip_service',
+        '_spawn_lock',  # need locks to ensure that the worker threads don't try and send multiple ros service requests (e.g. gateway flip requests)
+        '_kill_lock'    # at th same time
     ]
 
     def __init__(self):
         self.turtles = []
+        self._spawn_lock = threading.Lock()
+        self._kill_lock = threading.Lock()
         # herding backend
         rospy.wait_for_service('~internal/kill')  # could use timeouts here
         rospy.wait_for_service('~internal/spawn')
@@ -71,13 +76,13 @@ class TurtleHerder:
             rospy.loginfo("Turtle Herder : shutdown while contacting the internal kill turtle service")
             return
         # herding frontend
-        # we relay services inside the service pair, so make sure we use threads so it doesn't hold up requests from multiple sources
-        self._kill_turtle_service_pair_server = rocon_python_comms.ServicePairServer('kill', self._kill_turtle_service, concert_service_msgs.KillTurtlePair, use_threads=True)
-        self._spawn_turtle_service_pair_server = rocon_python_comms.ServicePairServer('spawn', self._spawn_turtle_service, concert_service_msgs.SpawnTurtlePair, use_threads=True)
         # gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         rospy.wait_for_service(gateway_namespace + '/flip')
         self._gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
+        # we relay services inside the service pair, so make sure we use threads so it doesn't hold up requests from multiple sources
+        self._kill_turtle_service_pair_server = rocon_python_comms.ServicePairServer('kill', self._kill_turtle_service, concert_service_msgs.KillTurtlePair, use_threads=True)
+        self._spawn_turtle_service_pair_server = rocon_python_comms.ServicePairServer('spawn', self._spawn_turtle_service, concert_service_msgs.SpawnTurtlePair, use_threads=True)
 
     def _kill_turtle_service(self, request_id, msg):
         '''
@@ -86,6 +91,7 @@ class TurtleHerder:
           @param msg
           @type ServiceRequest
         '''
+        self._kill_lock.acquire()
         response = concert_service_msgs.KillTurtleResponse()
         internal_service_request = turtlesim_srvs.KillRequest(msg.name)
         try:
@@ -95,9 +101,11 @@ class TurtleHerder:
             rospy.logerr("Turtle Herder : failed to contact the internal kill turtle service")
         except rospy.ROSInterruptException:
             rospy.loginfo("Turtle Herder : shutdown while contacting the internal kill turtle service")
+            self._kill_lock.release()
             return
         self._kill_turtle_service_pair_server.reply(request_id, response)
         self._send_flip_rules_request(name=msg.name, cancel=True)
+        self._kill_lock.release()
 
     def _spawn_turtle_service(self, request_id, msg):
         '''
@@ -106,6 +114,7 @@ class TurtleHerder:
           @param msg
           @type ServiceRequest
         '''
+        self._spawn_lock.acquire()
         # Unique name
         name = msg.name
         name_extension = ''
@@ -123,16 +132,18 @@ class TurtleHerder:
         try:
             unused_internal_service_response = self._spawn_turtle_service_client(internal_service_request)
             self.turtles.append(name)
-        except rospy.ServiceException:  # communication failed
-            rospy.logerr("TurtleHerder : failed to contact the internal spawn turtle service")
+        except rospy.ServiceException as e:  # communication failed
+            rospy.logerr("TurtleHerder : failed to contact the internal spawn turtle service [%s]" % e)
             name = ''
         except rospy.ROSInterruptException:
             rospy.loginfo("TurtleHerder : shutdown while contacting the internal spawn turtle service")
+            self._spawn_lock.release()
             return
         response = concert_service_msgs.SpawnTurtleResponse()
         response.name = name
         self._spawn_turtle_service_pair_server.reply(request_id, response)
         self._send_flip_rules_request(name=name, cancel=False)
+        self._spawn_lock.release()
 
     def _send_flip_rules_request(self, name, cancel):
         rules = []
@@ -154,9 +165,9 @@ class TurtleHerder:
             remote_rule.rule = rule
             request.remotes.append(copy.deepcopy(remote_rule))
         try:
-            self._gateway_flip_service(request)
-        except rospy.ServiceException:  # communication failed
-            rospy.logerr("TurtleHerder : failed to send flip rules")
+            response = self._gateway_flip_service(request)
+        except rospy.ServiceException as e:  # communication failed
+            rospy.logerr("TurtleHerder : failed to send flip rules [%s]" % e)
             return
         except rospy.ROSInterruptException:
             rospy.loginfo("TurtleHerder : shutdown while contacting the gateway flip service")
