@@ -2,6 +2,9 @@
   Launches the infrastructure running on a robot. 
  -->
 <launch>
+
+  <param name="/use_sim_time" value="true" />
+
   <arg name="robot_name" default="robot"/>
   <arg name="robot_rapp_whitelist" default="[]"/>
   <arg name="robot_concert_whitelist" default=""/>
@@ -18,4 +21,5 @@
     <arg name="local_remote_controllers_only" value="true"/>
     <arg name="screen" value="true" />
   </include>
+
 </launch>
