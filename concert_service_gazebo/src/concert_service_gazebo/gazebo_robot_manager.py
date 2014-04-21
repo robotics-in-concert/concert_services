@@ -8,14 +8,10 @@
 ##############################################################################
 
 # Simple script to manage spawning and killing of turtles across multimaster
-# boundaries. Typically turtlesim clients would connect to the kill and
+# boundaries. Typically gazebo clients would connect to the kill and
 # spawn services directly to instantiate themselves, but since we can't
 # flip service proxies, this is not possible. So this node is the inbetween
 # go-to node and uses a rocon service pair instead.
-#
-# It supplements this relay role with a bit of herd management - sets up
-# random start locations and feeds back aliased names when running with
-# a concert.
 
 ##############################################################################
 # Imports
@@ -31,7 +27,6 @@ import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
 import rocon_launch
 import rospy
-import rocon_console.console as console
 import rocon_gateway_utils
 import rocon_python_utils.ros
 
@@ -50,29 +45,38 @@ class ProcessInfo(object):
 
 class GazeboRobotManager:
     '''
-      Shepherds the turtles!
-
-      @todo get alised names from the concert client list if the topic is available
-
-      @todo watchdog for killing turtles that are no longer connected.
+      This class contains all the robot-independent functionality to launch
+      robots in gazebo, create concert clients for each robot, and flip
+      necessary information to each concert client, so each robot can truly
+      behave as a concert client.
     '''
 
     def __init__(self, robot_manager):
+        """
+        :param robot_manager RobotManager: Instantiation of abstract class
+            RobotManager that contains all robot specific information.
+        """
         self.robots = []
         self.robot_manager = robot_manager
         self._process_info = []
         self.is_disabled = False
-        # gateway
+
+        # Gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         rospy.wait_for_service(gateway_namespace + '/flip')
         self._gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
 
     def _spawn_simulated_robots(self, robots):
         """
-        Very important to have checked that the turtle names are unique
-        before calling this method.
+        Names and locations of robots to be spawned, read from a parameter file.
 
-        :param turtles str[]: names of the turtles to spawn.
+        :param robots list of dicts[]: The parameter file.
+        The parameter file should read into a list of dictionaries, where each
+        dict contains a "name" string, and a "location" tuple. For example:
+            [{'name': 'kobuki', 'location': [0.0, 0.0, 0.0]},
+             {'name': 'guimul', 'location': [0.0, 2.0, 0.0]}]
+        For a full definition of the location vector, see
+        RobotManager.spawn_robot().
         """
         for robot in robots:
             try:
@@ -84,11 +88,16 @@ class GazeboRobotManager:
                 continue
 
     def _launch_robot_clients(self, robot_names):
+        """
+        Spawn concert clients for given named robot.
+
+        :param robot_names str[]: Names of all robots.
+        """
         # spawn the turtle concert clients
         temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         rocon_launch_text = self.robot_manager.prepare_rocon_launch_text(robot_names)
         rospy.loginfo("GazeboRobotManager: constructing robot client rocon launcher")
-        print("\n" + console.green + rocon_launch_text + console.reset)
+        #print("\n" + console.green + rocon_launch_text + console.reset)
         temp.write(rocon_launch_text)
         temp.close()  # unlink it later
         rocon_launch_env = os.environ.copy()
@@ -105,19 +114,15 @@ class GazeboRobotManager:
             process = subprocess.Popen(['rocon_launch', temp.name, '--screen'], env=rocon_launch_env)
         self._process_info.append(ProcessInfo(process, temp))
 
-    def spawn_robots(self, robots):
-        unique_robots, unique_robot_names = self._establish_unique_names(robots)
-
-        self._spawn_simulated_robots(unique_robots)
-        self._launch_robot_clients(unique_robot_names)
-        self._send_flip_rules(unique_robot_names, cancel=False)
-
     def _establish_unique_names(self, robots):
         """
-        Make sure the turtle names don't clash with currently spawned turtles.
-        If they do, postfix them with an incrementing counter.
+        Make sure robot names don't clash with currently spawned robots, or 
+        with other robots in the same list itself. If they do, postfix them
+        with an incrementing counter.
 
-        :param turtles str[]: list of new turtle names to uniquify.
+        :param robots list of dicts[]: The parameter file defining robots and
+            start locations. For a full description, see
+            _spawn_simulated_robots().
         :return str[]: uniquified names for the turtles.
         """
         unique_robots = []
@@ -126,7 +131,8 @@ class GazeboRobotManager:
             robot_name = robot["name"]
             name_extension = ''
             count = 0
-            while robot_name + name_extension in unique_robot_names:
+            while (robot_name + name_extension in unique_robot_names or
+                   robot_name + name_extension in self.robots):
                 name_extension = str(count)
                 count = count + 1
             unique_robot_names.append(robot_name + name_extension)
@@ -136,6 +142,13 @@ class GazeboRobotManager:
         return unique_robots, unique_robot_names
 
     def _send_flip_rules(self, robot_names, cancel):
+        """
+        Flip rules from Gazebo to the robot's concert client.
+
+        :param robot_names str[]: Names of robots to whom information needs to
+            be flipped.
+        :param cancel bool: Cancel existing flips. Used during shutdown.
+        """
         for robot_name in robot_names:
             rules = self.robot_manager.get_flip_rule_list(robot_name)
             # send the request
@@ -155,17 +168,26 @@ class GazeboRobotManager:
                 rospy.loginfo("GazeboRobotManager : shutdown while contacting the gateway flip service")
                 return
 
-    def _ros_service_manager_disable_callback(self, msg):
-        self.is_disabled = True
+    def spawn_robots(self, robots):
+        """
+        Ensure all robots have existing names, spawn robots in gazebo, launch
+        concert clients, and flip necessary information from gazebo to each
+        concert client. 
+
+        :param robots list of dicts[]: The parameter file defining robots and
+            start locations. For a full description, see
+            _spawn_simulated_robots().
+        """
+        unique_robots, unique_robot_names = self._establish_unique_names(robots)
+        self._spawn_simulated_robots(unique_robots)
+        self._launch_robot_clients(unique_robot_names)
+        self._send_flip_rules(unique_robot_names, cancel=False)
 
     def shutdown(self):
         """
-          - Send unflip requests
-          - Cleanup turtles on the turtlesim canvas.
-          - Shutdown spawned terminals
-
-        :todo: this should go in a service manager callable ros callback where we can
-        call disable on this service and bring it down without having to SIGINT it.
+          - Send unflip requests.
+          - Cleanup robots in gazebo.
+          - Shutdown spawned terminals.
         """
         for name in self.robots:
             try:
