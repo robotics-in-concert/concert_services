@@ -25,7 +25,7 @@ import time
 import rospy
 import rocon_python_comms
 import concert_service_utilities
-import rocon_scheduler_requests
+import concert_scheduler_requests
 import unique_id
 import rocon_std_msgs.msg as rocon_std_msgs
 import scheduler_msgs.msg as scheduler_msgs
@@ -43,6 +43,7 @@ class TeleopPimp:
     __slots__ = [
         'service_name',
         'service_description',
+        'service_priority',
         'service_id',
         'scheduler_resources_subscriber',
         'list_available_teleops_server',
@@ -59,7 +60,7 @@ class TeleopPimp:
         ####################
         # Discovery
         ####################
-        (self.service_name, self.service_description, self.service_id) = concert_service_utilities.get_service_info()
+        (self.service_name, self.service_description, self.service_priority, self.service_id) = concert_service_utilities.get_service_info()
         try:
             known_resources_topic_name = rocon_python_comms.find_topic('scheduler_msgs/KnownResources', timeout=rospy.rostime.Duration(5.0), unique=True)
         except rocon_python_comms.NotFoundException as e:
@@ -69,11 +70,11 @@ class TeleopPimp:
         ####################
         # Setup
         ####################
+        self.lock = threading.Lock()
         self.concert_clients_subscriber = rospy.Subscriber(known_resources_topic_name, scheduler_msgs.KnownResources, self.ros_scheduler_known_resources_callback)
         self.available_teleops_publisher = rospy.Publisher('available_teleops', rocon_std_msgs.StringArray, latch=True)
         self.teleopable_robots = []
         self.requester = self.setup_requester(self.service_id)
-        self.lock = threading.Lock()
         self.pending_requests = []
         self.allocated_requests = {}
 
@@ -87,8 +88,8 @@ class TeleopPimp:
         except rocon_python_comms.NotFoundException as e:
             rospy.logerr("TeleopPimp : %s" % (str(e)))
             return  # raise an exception here?
-        frequency = rocon_scheduler_requests.common.HEARTBEAT_HZ
-        return rocon_scheduler_requests.Requester(self.requester_feedback, uuid, 0, scheduler_requests_topic_name, frequency)
+        frequency = concert_scheduler_requests.common.HEARTBEAT_HZ
+        return concert_scheduler_requests.Requester(self.requester_feedback, uuid, 0, scheduler_requests_topic_name, frequency)
 
     def ros_scheduler_known_resources_callback(self, msg):
         '''
@@ -102,7 +103,9 @@ class TeleopPimp:
         # find difference of incoming and stored lists based on unique concert names
         diff = lambda l1, l2: [x for x in l1 if x.uri not in [l.uri for l in l2]]
         # get all currently invited teleopable robots
-        resources = [r for r in msg.resources if 'rocon_apps/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
+        available_resources = [r for r in msg.resources if 'rocon_apps/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
+        preemptible_resources = [r for r in msg.resources if 'rocon_apps/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.ALLOCATED and r.priority < self.service_priority]
+        resources = available_resources + preemptible_resources
         self.lock.acquire()
         new_resources = diff(resources, self.teleopable_robots)
         lost_resources = diff(self.teleopable_robots, resources)
@@ -144,10 +147,10 @@ class TeleopPimp:
                 resource.id = unique_id.toMsg(unique_id.fromRandom())
                 resource.rapp = 'rocon_apps/teleop'
                 resource.uri = msg.rocon_uri
-                resource_request_id = self.requester.new_request([resource])
+                resource_request_id = self.requester.new_request([resource], priority=self.service_priority)
                 self.pending_requests.append(resource_request_id)
                 self.requester.send_requests()
-                timeout_time = time.time() + self.allocation_timeout 
+                timeout_time = time.time() + self.allocation_timeout
                 while not rospy.is_shutdown() and time.time() < timeout_time:
                     if resource_request_id not in self.pending_requests:
                         self.allocated_requests[msg.rocon_uri] = resource_request_id

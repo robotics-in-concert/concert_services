@@ -136,8 +136,8 @@ class TurtleHerder:
         # spawn the turtle concert clients
         temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         rocon_launch_text = prepare_rocon_launch_text(turtles)
-        rospy.loginfo("TurtleHerder: constructing turtle client rocon launcher")
-        print("\n" + console.green + rocon_launch_text + console.reset)
+        #rospy.loginfo("TurtleHerder: constructing turtle client rocon launcher")
+        #print("\n" + console.green + rocon_launch_text + console.reset)
         temp.write(rocon_launch_text)
         temp.close()  # unlink it later
         rocon_launch_env = os.environ.copy()
@@ -270,9 +270,9 @@ class TurtleHerder:
 if __name__ == '__main__':
 
     rospy.init_node('turtle_herder')
-    (service_name, unused_service_description, unused_service_id) = concert_service_utilities.get_service_info()
+    (service_name, unused_service_description, service_priority, unused_service_id) = concert_service_utilities.get_service_info()
     turtles = rospy.get_param('/services/' + service_name + '/turtles', [])
-    rospy.logwarn("TurtleHerder: spawning turtles: %s" % turtles)
+    rospy.loginfo("TurtleHerder: spawning turtles: %s" % turtles)
 
     turtle_herder = TurtleHerder()
     turtle_herder.spawn_turtles(turtles)
