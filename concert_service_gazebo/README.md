@@ -23,7 +23,7 @@ Unfortunately, a lot of code depends on the robot that you are going to simulate
 
 # An example
 
-Take a look at the [gazebo_segbot_concert](https://github.com/utexas-bwi/segbot_rocon/tree/master/gazebo_segbot_concert) demo.
+Take a look at the [gazebo_segbot_concert](https://github.com/utexas-bwi/rocon_segbot/tree/master/gazebo_segbot_concert) demo.
 
 * Install all the UTexas code:
 ```
@@ -31,7 +31,7 @@ sudo apt-get install ros-hydro-segbot* ros-hydro-bwi*
 ```
 * Install the UTexas Rocon code using this rosinstall entry:
 ```
-- git: {local-name: segbot_rocon, uri: 'https://github.com/utexas-bwi/segbot_rocon.git'}
+- git: {local-name: rocon_segbot, uri: 'https://github.com/utexas-bwi/rocon_segbot.git'}
 ```
 * Run the demo:
 ```
