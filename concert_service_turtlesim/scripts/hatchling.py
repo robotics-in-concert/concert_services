@@ -56,10 +56,11 @@ class Hatchling:
         self.kill_turtle = rocon_python_comms.ServicePairClient('kill', concert_service_msgs.KillTurtlePair)
         # gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway(timeout=rospy.rostime.Duration(10.0))
+        gateway_info = rocon_gateway_utils.resolve_gateway_info(gateway_namespace=gateway_namespace)
         self.gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
         self.name = rocon_gateway_utils.resolve_gateway_info(gateway_namespace).name
         # app manager
-        rospy.Subscriber('remote_controller', std_msgs.String, self._ros_subscriber_remote_controller)
+        rospy.Subscriber('/' + gateway_info.name + '/status', rocon_app_manager_msgs.Status, self._ros_subscriber_remote_controller)
         self.remote_controller = rocon_app_manager_msgs.Constants.NO_REMOTE_CONTROLLER
         self.remote_controller_updates = []
 
@@ -107,7 +108,7 @@ class Hatchling:
           changes in state.
         '''
         # only using thread-safe list operations: http://effbot.org/pyfaq/what-kinds-of-global-value-mutation-are-thread-safe.htm
-        self.remote_controller_updates.append(msg.data)
+        self.remote_controller_updates.append(msg.remote_controller)
         self.event_remote_controller_changed.set()
 
     def spin(self):
@@ -145,7 +146,7 @@ class Hatchling:
 ##############################################################################
 
 if __name__ == '__main__':
-    
+
     rospy.init_node('hatchling')
     hatchling = Hatchling()
     hatchling.spin()
