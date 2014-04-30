@@ -7,11 +7,11 @@
 # About
 ##############################################################################
 
-# Simple script to manage spawning and killing of turtles across multimaster
-# boundaries. Typically gazebo clients would connect to the kill and
-# spawn services directly to instantiate themselves, but since we can't
-# flip service proxies, this is not possible. So this node is the inbetween
-# go-to node and uses a rocon service pair instead.
+# Simple script to manage spawning and killing of simulated gazebo robots
+# for a concert. This node can be requested to trigger a rocon_launch'ed style
+# terminal which embeds a standard concert client for each gazebo robot. It
+# then flips across the necessary gazebo simulated handles to that concert
+# client
 
 ##############################################################################
 # Imports
@@ -34,6 +34,7 @@ import rocon_python_utils.ros
 # Utilities
 ##############################################################################
 
+
 class ProcessInfo(object):
     def __init__(self, process, temp_file):
         self.process = process
@@ -42,6 +43,7 @@ class ProcessInfo(object):
 ##############################################################################
 # Turtle Herder
 ##############################################################################
+
 
 class GazeboRobotManager:
     '''
@@ -93,7 +95,7 @@ class GazeboRobotManager:
 
         :param robot_names str[]: Names of all robots.
         """
-        # spawn the turtle concert clients
+        # spawn the concert clients
         temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         rocon_launch_text = self.robot_manager.prepare_rocon_launch_text(robot_names)
         rospy.loginfo("GazeboRobotManager: constructing robot client rocon launcher")
@@ -116,14 +118,14 @@ class GazeboRobotManager:
 
     def _establish_unique_names(self, robots):
         """
-        Make sure robot names don't clash with currently spawned robots, or 
+        Make sure robot names don't clash with currently spawned robots, or
         with other robots in the same list itself. If they do, postfix them
         with an incrementing counter.
 
         :param robots list of dicts[]: The parameter file defining robots and
             start locations. For a full description, see
             _spawn_simulated_robots().
-        :return str[]: uniquified names for the turtles.
+        :return str[]: uniquified names for the concert clients.
         """
         unique_robots = []
         unique_robot_names = []
@@ -172,7 +174,7 @@ class GazeboRobotManager:
         """
         Ensure all robots have existing names, spawn robots in gazebo, launch
         concert clients, and flip necessary information from gazebo to each
-        concert client. 
+        concert client.
 
         :param robots list of dicts[]: The parameter file defining robots and
             start locations. For a full description, see

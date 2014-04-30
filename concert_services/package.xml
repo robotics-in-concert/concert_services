@@ -14,6 +14,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>concert_service_admin</run_depend>
+  <run_depend>concert_service_gazebo</run_depend>
   <run_depend>concert_service_teleop</run_depend>
   <run_depend>concert_service_turtlesim</run_depend>
 
