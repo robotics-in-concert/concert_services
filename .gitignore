@@ -38,3 +38,5 @@ nosetests.xml
 # vim
 *.swp
 *.swo
+
+*.README.md.html

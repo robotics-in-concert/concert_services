@@ -26,7 +26,6 @@ import rocon_python_comms
 import concert_service_msgs.msg as concert_service_msgs
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
-import std_msgs.msg as std_msgs
 import rocon_app_manager_msgs.msg as rocon_app_manager_msgs
 import rocon_gateway_utils
 

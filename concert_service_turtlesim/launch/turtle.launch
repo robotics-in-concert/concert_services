@@ -2,21 +2,20 @@
   Launches the infrastructure running on a robot (turtle). 
  -->
 <launch>
-    <arg name="turtle_name" default="turtle"/>
-    <arg name="turtle_rapp_whitelist" default="[]"/>
-    <arg name="turtle_concert_whitelist" default=""/>
+    <arg name="turtle_name"        default="turtle"/>
+    <arg name="turtle_rapp_whitelist"     default="[]"/>
+    <arg name="turtle_concert_whitelist"  default=""/>
     <arg name="local_machine_only" default="true"/>  <!-- only accept invites from local concerts -->
-    <arg name="screen" default="true"/>
+    <arg name="screen"             default="true"/>
 
     <include file="$(find rocon_app_manager)/launch/concert_client.launch">
         <arg name="robot_name" value="$(arg turtle_name)"/>
-        <arg name="concert_whitelist" value="$(arg turtle_concert_whitelist)"/>
         <arg name="robot_type" value="pc"/>
+        <arg name="concert_whitelist" value="$(arg turtle_concert_whitelist)"/>
 	    <arg name="rapp_package_whitelist" value="$(arg turtle_rapp_whitelist)" />
-	    <arg name="rapp_package_blacklist" value="[]" />
-        <arg name="gateway_watch_loop_period" value="1"/> <!-- flip faster, convenient -->
-        <arg name="gateway_firewall" value="false"/>
-        <arg name="local_remote_controllers_only" value="$(arg local_machine_only)"/>
+        <arg name="concert_watch_period" value="1"/> <!-- flip faster, convenient -->
+        <arg name="firewall" value="false"/>
+        <arg name="local_machine_only" value="$(arg local_machine_only)"/>
         <arg name="screen" value="$(arg screen)" />
     </include>
     <!-- 
