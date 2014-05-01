@@ -2,7 +2,7 @@
 # Teleoperations
 ###############################################################################
 
-- name: concert_teleop_app
+- name: concert_teleop
   role: 'User'
   compatibility: rocon:/pc/*/hydro|indigo/*
   display_name: Concert Teleop
