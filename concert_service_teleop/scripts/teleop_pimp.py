@@ -148,6 +148,7 @@ class TeleopPimp:
                 resource.rapp = 'rocon_apps/teleop'
                 resource.uri = msg.rocon_uri
                 resource_request_id = self.requester.new_request([resource], priority=self.service_priority)
+                #rospy.logwarn("DJS : resource request id of new request [%s]" % resource_request_id)
                 self.pending_requests.append(resource_request_id)
                 self.requester.send_requests()
                 timeout_time = time.time() + self.allocation_timeout
@@ -168,6 +169,7 @@ class TeleopPimp:
                 rospy.loginfo("TeleopPimp : released teleopable robot [%s][%s]" % (msg.rocon_uri, self.allocated_requests[msg.rocon_uri].hex))
                 self.requester.rset[self.allocated_requests[msg.rocon_uri]].cancel()
                 self.requester.send_requests()
+                del self.allocated_requests[msg.rocon_uri]
             response.result = True
             self.allocate_teleop_service_pair_server.reply(request_id, response)
         self.lock.release()
@@ -182,6 +184,7 @@ class TeleopPimp:
           @type dic { uuid.UUID : scheduler_msgs.ResourceRequest }
         '''
         for request_id, request in request_set.requests.iteritems():
+            #rospy.logwarn("DJS : request %s has status [%s]" % (request_id, request.msg.status))
             if request.msg.status == scheduler_msgs.Request.GRANTED:
                 if request_id in self.pending_requests:
                     self.pending_requests.remove(request_id)

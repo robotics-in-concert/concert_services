@@ -2,11 +2,11 @@
   Launches the infrastructure running on a robot (turtle). 
  -->
 <launch>
-    <arg name="turtle_name"        default="turtle"/>
-    <arg name="turtle_rapp_whitelist"     default="[]"/>
-    <arg name="turtle_concert_whitelist"  default=""/>
-    <arg name="local_machine_only" default="true"/>  <!-- only accept invites from local concerts -->
-    <arg name="screen"             default="true"/>
+    <arg name="turtle_name"              default="turtle"/>
+    <arg name="turtle_rapp_whitelist"    default="[]"/>
+    <arg name="turtle_concert_whitelist" default=""/>
+    <arg name="local_machine_only"       default="true"/>  <!-- only accept invites from local concerts -->
+    <arg name="screen"                   default="true"/>
 
     <include file="$(find rocon_app_manager)/launch/concert_client.launch">
         <arg name="robot_name" value="$(arg turtle_name)"/>
