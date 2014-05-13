@@ -72,7 +72,7 @@ class TeleopPimp:
         ####################
         self.lock = threading.Lock()
         self.concert_clients_subscriber = rospy.Subscriber(known_resources_topic_name, scheduler_msgs.KnownResources, self.ros_scheduler_known_resources_callback)
-        self.available_teleops_publisher = rospy.Publisher('available_teleops', rocon_std_msgs.StringArray, latch=True)
+        self.available_teleops_publisher = rospy.Publisher('available_teleops', rocon_std_msgs.StringArray, latch=True, queue_size=5)
         self.teleopable_robots = []
         self.requester = self.setup_requester(self.service_id)
         self.pending_requests = []
