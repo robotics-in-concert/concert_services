@@ -5,29 +5,16 @@
     <arg name="turtle_name"              default="turtle"/>
     <arg name="turtle_rapp_whitelist"    default="[]"/>
     <arg name="turtle_concert_whitelist" default=""/>
-    <arg name="local_machine_only"       default="true"/>  <!-- only accept invites from local concerts -->
-    <arg name="screen"                   default="true"/>
 
     <include file="$(find rocon_app_manager)/launch/concert_client.launch">
         <arg name="robot_name" value="$(arg turtle_name)"/>
-        <arg name="robot_type" value="pc"/>
         <arg name="concert_whitelist" value="$(arg turtle_concert_whitelist)"/>
+        <arg name="robot_type" value="pc"/>
 	    <arg name="rapp_package_whitelist" value="$(arg turtle_rapp_whitelist)" />
         <arg name="concert_watch_period" value="1"/> <!-- flip faster, convenient -->
         <arg name="firewall" value="false"/>
-        <arg name="local_machine_only" value="$(arg local_machine_only)"/>
-        <arg name="screen" value="$(arg screen)" />
+        <arg name="robot_unique_name" value="false"/>  <!-- do not change this to true! the turtlesim service sets its own unique names for the robots -->
+        <arg name="local_machine_only" value="true"/>
+        <arg name="screen" value="true" />
     </include>
-    <!-- 
-      This has an issue if turtlesim service is renamed
-          https://github.com/robotics-in-concert/rocon_tutorials/issues/31
-      Not fixing for now as we will phase this turtle out for turtle2.
-     -->
-    <node pkg="concert_service_turtlesim" type="hatchling.py" name="$(anon hatchling)">
-        <!-- Concert turtlesim service remaps --> 
-        <remap from="spawn/request" to="services/turtlesim/spawn/request"/>
-        <remap from="spawn/response" to="services/turtlesim/spawn/response"/>
-        <remap from="kill/request" to="services/turtlesim/kill/request"/>
-        <remap from="kill/response" to="services/turtlesim/kill/response"/>
-    </node>
 </launch>

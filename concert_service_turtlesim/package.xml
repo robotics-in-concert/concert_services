@@ -29,6 +29,5 @@
 
   <export>
     <concert_service>services/turtlesim/turtlesim.service</concert_service>
-    <concert_service>services/turtlesim2/turtlesim2.service</concert_service>
   </export>
 </package>

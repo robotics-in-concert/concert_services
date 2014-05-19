@@ -1,0 +1,11 @@
+# This needs some work - we need to actually pass in more variables
+# than just the names, see launch/turtle.launch for possible args.
+#
+# Currently:
+#    <arg name="turtle_name"              default="turtle"/>
+#    <arg name="turtle_rapp_whitelist"    default="[]"/>
+#    <arg name="turtle_concert_whitelist" default=""/>
+#
+turtles:
+  - kobuki
+  - guimul
