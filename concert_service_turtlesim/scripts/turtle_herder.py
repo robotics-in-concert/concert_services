@@ -48,7 +48,7 @@ def prepare_launch_configurations(turtles):
     for name in turtles:
         launch_text += '  <launch title="%s:114%s" package="concert_service_turtlesim" name="turtle.launch" port="114%s">\n' % (name, str(port), str(port))
         launch_text += '    <arg name="turtle_name" value="%s"/>\n' % name
-        launch_text += '    <arg name="turtle_concert_whitelist" value="Turtle Concert;Turtle Teleop Concert;Concert Tutorial"/>\n'
+        launch_text += '    <arg name="turtle_concert_whitelist" value="[Turtle Concert, Turtle Teleop Concert, Concert Tutorial]"/>\n'
         launch_text += '    <arg name="turtle_rapp_whitelist" value="[rocon_apps, turtle_concert]"/>\n'
         launch_text += '  </launch>\n'
         port = port + 1

@@ -7,7 +7,7 @@
 
   <arg name="robot_name" default="robot"/>
   <arg name="robot_rapp_whitelist" default="[]"/>
-  <arg name="robot_concert_whitelist" default=""/>
+  <arg name="robot_concert_whitelist" default="[]"/>
 
   <include file="$(find rocon_app_manager)/launch/concert_client.launch">
     <arg name="robot_name" value="$(arg robot_name)"/>
