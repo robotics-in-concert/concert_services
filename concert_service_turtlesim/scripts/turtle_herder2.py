@@ -25,18 +25,15 @@ import copy
 import math
 import os
 import random
-import signal
 import tempfile
-import subprocess
 
 import concert_service_utilities
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
 import rocon_launch
 import rospy
-import rocon_console.console as console
 import rocon_gateway_utils
-import rocon_python_utils.ros
+import rocon_python_comms
 import std_msgs.msg as std_msgs
 import turtlesim.srv as turtlesim_srvs
 
@@ -45,7 +42,7 @@ import turtlesim.srv as turtlesim_srvs
 ##############################################################################
 
 
-def prepare_rocon_launch_text(turtles):
+def prepare_launch_configurations(turtles):
     port = 11
     launch_text = '<concert>\n'
     for name in turtles:
@@ -56,13 +53,17 @@ def prepare_rocon_launch_text(turtles):
         launch_text += '  </launch>\n'
         port = port + 1
     launch_text += '</concert>\n'
-    return launch_text
-
-
-class ProcessInfo(object):
-    def __init__(self, process, temp_file):
-        self.process = process
-        self.temp_file = temp_file
+    temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+    #print("\n" + console.green + rocon_launch_text + console.reset)
+    temp.write(launch_text)
+    rospy.logwarn("Turtle Herder: rocon launch text\n%s" % launch_text)
+    temp.close()  # unlink it later
+    launch_configurations = rocon_launch.parse_rocon_launcher(temp.name, "--screen")
+    try:
+        os.unlink(temp.name)
+    except OSError:
+        rospy.logerr("Turtle Herder : failed to unlink the rocon launcher.")
+    return launch_configurations
 
 ##############################################################################
 # Turtle Herder
@@ -78,17 +79,20 @@ class TurtleHerder:
       @todo watchdog for killing turtles that are no longer connected.
     '''
     __slots__ = [
-        'turtles',  # list of turtle name strings
+        'turtles',              # list of turtle name strings
         '_kill_turtle_service_client',
         '_spawn_turtle_service_client',
         '_gateway_flip_service',
-        '_process_info',
-        'is_disabled'  # flag set when service manager tells it to shut down.
+        '_processes',
+        '_temporary_files',     # temporary files that have to be unlinked later
+        'is_disabled',          # flag set when service manager tells it to shut down.
+        '_terminal',  # terminal to use to spawn concert clients
     ]
 
     def __init__(self):
         self.turtles = []
-        self._process_info = []
+        self._processes = []
+        self._temporary_files = []
         self.is_disabled = False
         # herding backend
         rospy.wait_for_service('kill')  # could use timeouts here
@@ -108,6 +112,12 @@ class TurtleHerder:
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         rospy.wait_for_service(gateway_namespace + '/flip')
         self._gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
+        # set up a terminal type for spawning
+        try:
+            self._terminal = rocon_launch.create_terminal()
+        except (rocon_launch.UnsupportedTerminal, rocon_python_comms.NotFoundException) as e:
+            rospy.logwarn("Turtle Herder : cannot find a suitable terminal, falling back to spawning inside the current one [%s]" % str(e))
+            self._terminal = rocon_launch.create_terminal(rocon_launch.terminals.active)
 
     def _spawn_simulated_turtles(self, turtles):
         """
@@ -134,25 +144,15 @@ class TurtleHerder:
 
     def _launch_turtle_clients(self, turtles):
         # spawn the turtle concert clients
-        temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
-        rocon_launch_text = prepare_rocon_launch_text(turtles)
-        #rospy.loginfo("TurtleHerder: constructing turtle client rocon launcher")
-        #print("\n" + console.green + rocon_launch_text + console.reset)
-        temp.write(rocon_launch_text)
-        temp.close()  # unlink it later
-        rocon_launch_env = os.environ.copy()
-        try:
-            # ROS_NAMESPACE gets set since we are inside a node here
-            # got to get rid of this otherwise it pushes things down
-            del rocon_launch_env['ROS_NAMESPACE']
-        except KeyError:
-            pass
-        rospy.loginfo("TurtleHerder : starting process %s" % ['rocon_launch', temp.name, '--screen'])
-        if rocon_python_utils.ros.get_rosdistro() == 'hydro':
-            process = subprocess.Popen(['rocon_launch', '--gnome', temp.name, '--screen'], env=rocon_launch_env)
-        else:
-            process = subprocess.Popen(['rocon_launch', temp.name, '--screen'], env=rocon_launch_env)
-        self._process_info.append(ProcessInfo(process, temp))
+        launch_configurations = prepare_launch_configurations(turtles)
+        for launch_configuration in launch_configurations:
+            rospy.loginfo("Turtle Herder : launching turtle concert client %s on port %s" %
+                      (launch_configuration.name, launch_configuration.port))
+            print("%s" % launch_configuration)
+            process, meta_roslauncher = self._terminal.spawn_roslaunch_window(launch_configuration)
+            print("DJS : meta roslauncher [%s]" % meta_roslauncher.name)
+            self._processes.append(process)
+            self._temporary_files.append(meta_roslauncher)
 
     def spawn_turtles(self, turtles):
         unique_turtle_names = self._establish_unique_names(turtles)
@@ -231,37 +231,14 @@ class TurtleHerder:
         #     except rospy.ROSInterruptException:
         #         break  # quietly fail
 
-        for process_info in self._process_info:
-            print("Pid: %s" % process_info.process.pid)
-            roslaunch_pids = rocon_launch.get_roslaunch_pids(process_info.process.pid)
-            print("Roslaunch Pids: %s" % roslaunch_pids)
-        # The os.kills aren't required if a concert is doing a full shutdown since
-        # it disperses signals everywhere anyway. This is important if we implement the
-        # disable from the service manager though.
-        for pid in roslaunch_pids:
+        self._terminal.shutdown_roslaunch_windows(processes=self._processes,
+                                                  hold=False)
+        for temporary_file in self._temporary_files:
+            #print("Unlinking %s" % temporary_file.name)
             try:
-                os.kill(pid, signal.SIGINT)  # sighup or sigint? I can't remember - this is same as rocon_launch code
-            except OSError:
-                continue
-        for pid in roslaunch_pids:
-            print("Waiting on roslaunch pid %s" % pid)
-            result = rocon_python_utils.system.wait_pid(pid)
-            print("Pid %s exited with result %s" % (pid, result))
-#         time.sleep(1)  # Do we need this?
-        for process_info in self._process_info:
-            print("Now killing konsoles %s" % process_info.process.pid)
-            try:
-                os.killpg(process_info.process.pid, signal.SIGTERM)
-                #process_info.process.terminate()
-            except OSError:
-                print("process already died naturally")
-                pass
-        for process_info in self._process_info:
-            print("Unlinking %s" % process_info.temp_file.name)
-            try:
-                os.unlink(process_info.temp_file.name)
-            except OSError:
-                pass
+                os.unlink(temporary_file.name)
+            except OSError as e:
+                rospy.logerr("Turtle Herder : failed to unlink temporary file [%s]" % str(e))
 
 ##############################################################################
 # Launch point
