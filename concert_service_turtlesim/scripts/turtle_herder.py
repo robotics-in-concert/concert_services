@@ -43,13 +43,16 @@ import turtlesim.srv as turtlesim_srvs
 
 
 def prepare_launch_configurations(turtles):
+    """
+    :param Turtle[] turtles:
+    """
     port = 11
     launch_text = '<concert>\n'
-    for name in turtles:
-        launch_text += '  <launch title="%s:114%s" package="concert_service_turtlesim" name="turtle.launch" port="114%s">\n' % (name, str(port), str(port))
-        launch_text += '    <arg name="turtle_name" value="%s"/>\n' % name
-        launch_text += '    <arg name="turtle_concert_whitelist" value="[Turtle Concert, Turtle Teleop Concert, Concert Tutorial]"/>\n'
-        launch_text += '    <arg name="turtle_rapp_whitelist" value="[rocon_apps, turtle_concert]"/>\n'
+    for turtle in turtles:
+        launch_text += '  <launch title="%s:114%s" package="concert_service_turtlesim" name="turtle.launch" port="114%s">\n' % (turtle.unique_name, str(port), str(port))
+        launch_text += '    <arg name="turtle_name" value="%s"/>\n' % turtle.unique_name
+        launch_text += '    <arg name="turtle_concert_whitelist" value="%s"/>\n' % str(turtle.concert_whitelist)  # e.g. [Turtle Concert, Turtle Teleop Concert, Concert Tutorial]
+        launch_text += '    <arg name="turtle_rapp_whitelist" value="%s"/>\n' % str(turtle.rapp_whitelist)  # e.g. [rocon_apps, turtle_concert]
         launch_text += '  </launch>\n'
         port = port + 1
     launch_text += '</concert>\n'
@@ -65,12 +68,34 @@ def prepare_launch_configurations(turtles):
         rospy.logerr("Turtle Herder : failed to unlink the rocon launcher.")
     return launch_configurations
 
+
+##############################################################################
+# Turtle
+##############################################################################
+
+class Turtle(object):
+    """
+    Holds parameterised information used for customising a turtle spawning.
+    """
+    __slots__ = [
+                 'name',
+                 'unique_name',
+                 'rapp_whitelist',
+                 'concert_whitelist'
+                ]
+
+    def __init__(self, name, rapp_whitelist, concert_whitelist):
+        self.name = name
+        self.unique_name = name  # this gets manipulated later
+        self.rapp_whitelist = rapp_whitelist
+        self.concert_whitelist = concert_whitelist
+
 ##############################################################################
 # Turtle Herder
 ##############################################################################
 
 
-class TurtleHerder:
+class TurtleHerder(object):
     '''
       Shepherds the turtles!
 
@@ -86,7 +111,8 @@ class TurtleHerder:
         '_processes',
         '_temporary_files',     # temporary files that have to be unlinked later
         'is_disabled',          # flag set when service manager tells it to shut down.
-        '_terminal',  # terminal to use to spawn concert clients
+        '_terminal',            # terminal to use to spawn concert clients
+        '_shutdown_subscriber'
     ]
 
     def __init__(self):
@@ -124,14 +150,14 @@ class TurtleHerder:
         Very important to have checked that the turtle names are unique
         before calling this method.
 
-        :param turtles str[]: names of the turtles to spawn.
+        :param Turtle[] turtles:
         """
         for turtle in turtles:
             internal_service_request = turtlesim_srvs.SpawnRequest(
                                                 random.uniform(3.5, 6.5),
                                                 random.uniform(3.5, 6.5),
                                                 random.uniform(0.0, 2.0 * math.pi),
-                                                turtle)
+                                                turtle.unique_name)
             try:
                 unused_internal_service_response = self._spawn_turtle_service_client(internal_service_request)
                 self.turtles.append(turtle)
@@ -143,6 +169,9 @@ class TurtleHerder:
                 continue
 
     def _launch_turtle_clients(self, turtles):
+        """
+        :param Turtle[] turtles:
+        """
         # spawn the turtle concert clients
         launch_configurations = prepare_launch_configurations(turtles)
         for launch_configuration in launch_configurations:
@@ -154,48 +183,52 @@ class TurtleHerder:
             self._temporary_files.append(meta_roslauncher)
 
     def spawn_turtles(self, turtles):
-        unique_turtle_names = self._establish_unique_names(turtles)
-        self.turtles.extend(unique_turtle_names)
-
-        self._spawn_simulated_turtles(turtles)
-        self._launch_turtle_clients(unique_turtle_names)
-        self._send_flip_rules(unique_turtle_names, cancel=False)
+        """
+        :param Turtle[] turtles:
+        """
+        uniquely_named_turtles = self._establish_unique_names(turtles)
+        self._spawn_simulated_turtles(uniquely_named_turtles)
+        self._launch_turtle_clients(uniquely_named_turtles)
+        self._send_flip_rules(uniquely_named_turtles, cancel=False)
 
     def _establish_unique_names(self, turtles):
         """
         Make sure the turtle names don't clash with currently spawned turtles.
         If they do, postfix them with an incrementing counter.
 
-        :param turtles str[]: list of new turtle names to uniquify.
-        :return str[]: uniquified names for the turtles.
+        :param Turtle[] turtles: list of new turtle names to uniquify.
+        :returns: uniquified names for the turtles.
+        :rtype Turtle[]: updated turtles
         """
-        unique_turtle_names = []
-        for turtle_name in turtles:
+        for turtle in turtles:
             name_extension = ''
             count = 0
-            while turtle_name + name_extension in self.turtles:
+            while turtle.name + name_extension in [turtle.name for turtle in self.turtles]:
                 name_extension = '_' + str(count)
                 count = count + 1
-            unique_turtle_names.append(turtle_name + name_extension)
-        return unique_turtle_names
+            turtle.unique_name = turtle.name + name_extension
+        return turtles
 
     def _send_flip_rules(self, turtles, cancel):
+        """
+        :param Turtle[] turtles:
+        """
         for turtle in turtles:
             rules = []
             rule = gateway_msgs.Rule()
             rule.node = ''
             rule.type = gateway_msgs.ConnectionType.SUBSCRIBER
             # could resolve this better by looking up the service info
-            rule.name = "/services/turtlesim/%s/cmd_vel" % turtle
+            rule.name = "/services/turtlesim/%s/cmd_vel" % turtle.unique_name
             rules.append(copy.deepcopy(rule))
             rule.type = gateway_msgs.ConnectionType.PUBLISHER
-            rule.name = "/services/turtlesim/%s/pose" % turtle
+            rule.name = "/services/turtlesim/%s/pose" % turtle.unique_name
             rules.append(copy.deepcopy(rule))
             # send the request
             request = gateway_srvs.RemoteRequest()
             request.cancel = cancel
             remote_rule = gateway_msgs.RemoteRule()
-            remote_rule.gateway = turtle
+            remote_rule.gateway = turtle.unique_name
             for rule in rules:
                 remote_rule.rule = rule
                 request.remotes.append(copy.deepcopy(remote_rule))
@@ -247,8 +280,15 @@ if __name__ == '__main__':
 
     rospy.init_node('turtle_herder')
     (service_name, unused_service_description, service_priority, unused_service_id) = concert_service_utilities.get_service_info()
-    turtles = rospy.get_param('/services/' + service_name + '/turtles', [])
-    rospy.loginfo("TurtleHerder: spawning turtles: %s" % turtles)
+    turtles = []
+    turtle_parameters = rospy.get_param('/services/' + service_name + '/turtles', {})
+    # should check that turtle_parameters is a dict here
+    for name, parameters in turtle_parameters.items():
+        try:
+            turtles.append(Turtle(name, parameters['rapp_whitelist'], parameters['concert_whitelist']))
+        except KeyError as e:
+            rospy.logerr("TurtleHerder : not all turtle parameters found for %s (req'd even if empty)[%s]" % (name, str(e)))
+    rospy.loginfo("TurtleHerder : spawning turtles: %s" % [turtle.name for turtle in turtles])
 
     turtle_herder = TurtleHerder()
     turtle_herder.spawn_turtles(turtles)
