@@ -20,7 +20,6 @@ catkin_package()
 install(
     PROGRAMS 
         scripts/turtle_herder.py
-        scripts/hatchling.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     )
 
