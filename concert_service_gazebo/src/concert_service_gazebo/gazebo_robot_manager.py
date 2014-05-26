@@ -19,29 +19,16 @@
 
 import copy
 import os
-import signal
 import tempfile
-import subprocess
 
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
 import rocon_launch
 import rospy
 import rocon_gateway_utils
-import rocon_python_utils.ros
 
 ##############################################################################
-# Utilities
-##############################################################################
-
-
-class ProcessInfo(object):
-    def __init__(self, process, temp_file):
-        self.process = process
-        self.temp_file = temp_file
-
-##############################################################################
-# Turtle Herder
+# Gazebo Robot Manager
 ##############################################################################
 
 
@@ -60,13 +47,21 @@ class GazeboRobotManager:
         """
         self.robots = []
         self.robot_manager = robot_manager
-        self._process_info = []
         self.is_disabled = False
+        self._processes = []
+        self._temporary_files = []
 
         # Gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
         rospy.wait_for_service(gateway_namespace + '/flip')
         self._gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
+
+        # Terminal type for spawning
+        try:
+            self._terminal = rocon_launch.create_terminal()
+        except (rocon_launch.UnsupportedTerminal, rocon_python_comms.NotFoundException) as e:
+            rospy.logwarn("Turtle Herder : cannot find a suitable terminal, falling back to spawning inside the current one [%s]" % str(e))
+            self._terminal = rocon_launch.create_terminal(rocon_launch.terminals.active)
 
     def _spawn_simulated_robots(self, robots):
         """
@@ -96,25 +91,25 @@ class GazeboRobotManager:
         :param robot_names str[]: Names of all robots.
         """
         # spawn the concert clients
-        temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         rocon_launch_text = self.robot_manager.prepare_rocon_launch_text(robot_names)
-        rospy.loginfo("GazeboRobotManager: constructing robot client rocon launcher")
+        rospy.loginfo("GazeboRobotManager : constructing robot client rocon launcher")
         #print("\n" + console.green + rocon_launch_text + console.reset)
+        temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         temp.write(rocon_launch_text)
-        temp.close()  # unlink it later
-        rocon_launch_env = os.environ.copy()
+        temp.close()
+        launch_configurations = rocon_launch.parse_rocon_launcher(temp.name, "--screen")
         try:
-            # ROS_NAMESPACE gets set since we are inside a node here
-            # got to get rid of this otherwise it pushes things down
-            del rocon_launch_env['ROS_NAMESPACE']
-        except KeyError:
-            pass
-        rospy.loginfo("GazeboRobotManager : starting process %s" % ['rocon_launch', temp.name, '--screen'])
-        if rocon_python_utils.ros.get_rosdistro() == 'hydro':
-            process = subprocess.Popen(['rocon_launch', '--gnome', temp.name, '--screen'], env=rocon_launch_env)
-        else:
-            process = subprocess.Popen(['rocon_launch', temp.name, '--screen'], env=rocon_launch_env)
-        self._process_info.append(ProcessInfo(process, temp))
+            os.unlink(temp.name)
+        except OSError:
+            rospy.logerr("GazeboRobotManager : failed to unlink the rocon launcher.")
+
+        for launch_configuration in launch_configurations:
+            rospy.loginfo("GazeboRobotManager : launching concert client %s on port %s" %
+                      (launch_configuration.name, launch_configuration.port))
+            #print("%s" % launch_configuration)
+            process, meta_roslauncher = self._terminal.spawn_roslaunch_window(launch_configuration)
+            self._processes.append(process)
+            self._temporary_files.append(meta_roslauncher)
 
     def _establish_unique_names(self, robots):
         """
@@ -198,35 +193,11 @@ class GazeboRobotManager:
             except rospy.ROSInterruptException:
                 break  # quietly fail
 
-        for process_info in self._process_info:
-            print("Pid: %s" % process_info.process.pid)
-            roslaunch_pids = rocon_launch.get_roslaunch_pids(process_info.process.pid)
-            print("Roslaunch Pids: %s" % roslaunch_pids)
-        # The os.kills aren't required if a concert is doing a full shutdown since
-        # it disperses signals everywhere anyway. This is important if we implement the
-        # disable from the service manager though.
-        for pid in roslaunch_pids:
+        self._terminal.shutdown_roslaunch_windows(processes=self._processes,
+                                                  hold=False)
+        for temporary_file in self._temporary_files:
+            #print("Unlinking %s" % temporary_file.name)
             try:
-                os.kill(pid, signal.SIGINT)  # sighup or sigint? I can't remember - this is same as rocon_launch code
-            except OSError:
-                continue
-        for pid in roslaunch_pids:
-            print("Waiting on roslaunch pid %s" % pid)
-            result = rocon_python_utils.system.wait_pid(pid)
-            print("Pid %s exited with result %s" % (pid, result))
-#         time.sleep(1)  # Do we need this?
-        for process_info in self._process_info:
-            print("Now killing konsoles %s" % process_info.process.pid)
-            try:
-                os.killpg(process_info.process.pid, signal.SIGTERM)
-                #process_info.process.terminate()
-            except OSError:
-                print("process already died naturally")
-                pass
-        for process_info in self._process_info:
-            print("Unlinking %s" % process_info.temp_file.name)
-            try:
-                os.unlink(process_info.temp_file.name)
-            except OSError:
-                pass
-
+                os.unlink(temporary_file.name)
+            except OSError as e:
+                rospy.logerr("GazeboRobotManager : failed to unlink temporary file [%s]" % str(e))
