@@ -103,8 +103,8 @@ class TeleopPimp:
         # find difference of incoming and stored lists based on unique concert names
         diff = lambda l1, l2: [x for x in l1 if x.uri not in [l.uri for l in l2]]
         # get all currently invited teleopable robots
-        available_resources = [r for r in msg.resources if 'rocon_apps/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
-        preemptible_resources = [r for r in msg.resources if 'rocon_apps/teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.ALLOCATED and r.priority < self.service_priority]
+        available_resources = [r for r in msg.resources if 'rocon_apps/video_teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.AVAILABLE]
+        preemptible_resources = [r for r in msg.resources if 'rocon_apps/video_teleop' in r.rapps and r.status == scheduler_msgs.CurrentStatus.ALLOCATED and r.priority < self.service_priority]
         resources = available_resources + preemptible_resources
         self.lock.acquire()
         new_resources = diff(resources, self.teleopable_robots)
@@ -145,7 +145,7 @@ class TeleopPimp:
                 # send a request
                 resource = scheduler_msgs.Resource()
                 resource.id = unique_id.toMsg(unique_id.fromRandom())
-                resource.rapp = 'rocon_apps/teleop'
+                resource.rapp = 'rocon_apps/video_teleop'
                 resource.uri = msg.rocon_uri
                 resource_request_id = self.requester.new_request([resource], priority=self.service_priority)
                 #rospy.logwarn("DJS : resource request id of new request [%s]" % resource_request_id)
