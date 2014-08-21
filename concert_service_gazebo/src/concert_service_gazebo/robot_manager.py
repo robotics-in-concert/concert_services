@@ -11,37 +11,34 @@
 # be defined. This robot specific module will be used by GazeboRobotManager to
 # spawn and kill robots in gazebo.
 
-import subprocess
-import tempfile
-
 import rospy
 import rocon_python_utils
-from gazebo_msgs.srv as gazebo_srvs
+import gazebo_msgs.srv as gazebo_srvs
 from gateway_msgs.msg import Rule, ConnectionType
 from .utils import reformat_position_vector, generate_spawn_robot_launch_script, start_roslaunch_process 
 
 class RobotManager(object):
 
-    __slots__ ['_robot_type', '_launch', '_world_name', '_processes', '_srv']
+    __slots__ = ['_robot_type', '_launch', '_world_namespace', '_processes', '_srv']
     
-    def __init__(self, robot_type, world_name):
+    def __init__(self, robot_type, world_namespace):
         self._robot_type = robot_type['name']
         self._launch = rocon_python_utils.ros.find_resource_from_string(robot_type['launch'])
-        self._world_name = world_name
+        self._world_namespace = world_namespace
         self._processes = {}
         self._srv = {}
 
         self._setup_gazebo_api()
 
     def _setup_gazebo_api(self):
-        delete_model_srv_name = self._world_name + '/delete_model'
+        delete_model_srv_name = self._world_namespace + '/delete_model'
         rospy.wait_for_service(delete_model_srv_name)
         
-        self._srv['delete_model'] = rospy.ServiceProxy(delete_model_srv_name)
+        self._srv['delete_model'] = rospy.ServiceProxy(delete_model_srv_name, gazebo_srvs.DeleteModel)
 
     def spawn_robot(self, name, position_vector, args=None):
-        reformatted_position_vector = reformat_position_vector(position_vector)
-        launch_script = generate_spawn_robot_launch_script(name, reformat_position_vector, world_name, self._launch, args)
+        location = reformat_position_vector(position_vector)
+        launch_script = generate_spawn_robot_launch_script(name, location, self._world_namespace, self._launch, args)
 
         self._processes[name] = start_roslaunch_process(launch_script)
 
@@ -54,4 +51,4 @@ class RobotManager(object):
             rospy.logerr('GazeboRobotManager : unable to delete model %s' % name)
 
     def get_flip_rule_list(self):
-        return [Rule
+        return []

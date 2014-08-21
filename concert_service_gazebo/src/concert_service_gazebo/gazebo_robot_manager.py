@@ -28,7 +28,25 @@ import rospy
 import rocon_gateway_utils
 
 from .robot_manager import RobotManager
-from .utils import prepare_robot_managers
+
+##############################################################################
+# Utility 
+##############################################################################
+def prepare_robot_managers(robot_types, world_name):
+    """
+    Prepare robot manager objects based on its type
+    
+    :param robot_types: The configurations define robots model launcher in gazebo
+    :type robot_types: [{name: robot_type, launch: <package>/<.launch>}]
+    
+    :returns: A dict of robot manager 
+    :rtype: {robot_type: RobotManager()}
+    """
+    robot_managers = {}
+    for t in robot_types:
+        robot_managers[t['name']] = RobotManager(t, world_name)
+
+    return robot_managers
 
 ##############################################################################
 # Gazebo Robot Manager
@@ -52,6 +70,7 @@ class GazeboRobotManager:
         self._concert_name = concert_name
         self._processes = []
         self._temporary_files = []
+        self.robots = []
 
         # Gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
@@ -118,7 +137,7 @@ class GazeboRobotManager:
         port = 11411
         launch_text  = '<concert>\n'
         for robot in robots:
-            launch_text += '  <launch title="%s:4%s" package="concert_service_gazebo" name="robot.launch" port="%s">\n'%(name, str(port), str(port))
+            launch_text += '  <launch title="%s:%s" package="concert_service_gazebo" name="robot.launch" port="%s">\n'%(robot['name'], str(port), str(port))
             launch_text += '    <arg name="robot_name" value="%s"/>\n' % robot['name']
             launch_text += '    <arg name="robot_concert_whitelist" value="%s"/>\n' % self._concert_name 
             launch_text += '    <arg name="robot_rapp_whitelist" value="%s"/>\n' % str(robot['robot_rapp_whitelist'])
@@ -164,12 +183,12 @@ class GazeboRobotManager:
         :param cancel bool: Cancel existing flips. Used during shutdown.
         """
         for robot in robots:
-            rules = self.robot_managers[robot['type']].get_flip_rule_list()
+            rules = self._robot_managers[robot['type']].get_flip_rule_list()
             # send the request
             request = gateway_srvs.RemoteRequest()
             request.cancel = cancel
             remote_rule = gateway_msgs.RemoteRule()
-            remote_rule.gateway = robot_name
+            remote_rule.gateway = robot['name'] 
             for rule in rules:
                 remote_rule.rule = rule
                 request.remotes.append(copy.deepcopy(remote_rule))
@@ -199,11 +218,11 @@ class GazeboRobotManager:
         self._robot_managers = prepare_robot_managers(robot_types, self._world_name)
         self._spawn_simulated_robots(unique_robots, self._robot_managers)
         self._launch_robot_clients(unique_robots)
-        self._send_flip_rules(self._robot_managers, unique_robots, cancel=False)
+        self._send_flip_rules(unique_robots, cancel=False)
 
     def spin(self):
         try:
-            while not rospy.is_shutdown() and not gazebo_manager.is_disabled:
+            while not rospy.is_shutdown() and not self.is_disabled:
                 rospy.sleep(0.3)
         except rospy.ROSInterruptException:
             pass

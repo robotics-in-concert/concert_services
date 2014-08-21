@@ -11,8 +11,9 @@ if __name__ == '__main__':
     robots      = rospy.get_param('robots', [])
     robot_types = rospy.get_param('types', [])
     world_name = rospy.get_param('world', 'gazebo')
+    world_namespace = '/services/' + service_name + '/' + str(world_name) + '/'
     concert_name = rospy.get_param('/concert/name')
-    gazebo_manager = GazeboRobotManager(world_name, concert_name)
+    gazebo_manager = GazeboRobotManager(world_namespace, concert_name)
     gazebo_manager.loginfo('spawning robots : %s'%str(robots))
     gazebo_manager.spawn_robots(robots, robot_types)
 
