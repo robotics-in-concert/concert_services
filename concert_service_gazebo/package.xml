@@ -24,4 +24,8 @@
   <run_depend>rocon_python_utils</run_depend>
   <run_depend>rospy</run_depend>
 
+  <export>
+    <concert_service>services/gazebo_robot_world/gazebo_robot_world.service</concert_service>
+  </export>
+
 </package>

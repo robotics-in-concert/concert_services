@@ -27,10 +27,12 @@ import rocon_launch
 import rospy
 import rocon_gateway_utils
 
+from .robot_manager import RobotManager
+from .utils import prepare_robot_managers
+
 ##############################################################################
 # Gazebo Robot Manager
 ##############################################################################
-
 
 class GazeboRobotManager:
     '''
@@ -40,14 +42,14 @@ class GazeboRobotManager:
       behave as a concert client.
     '''
 
-    def __init__(self, robot_manager):
+    def __init__(self, world_name, concert_name):
         """
-        :param robot_manager RobotManager: Instantiation of abstract class
-            RobotManager that contains all robot specific information.
+        :param world_name: Gazebo World name
         """
-        self.robots = []
-        self.robot_manager = robot_manager
         self.is_disabled = False
+        self._robot_manager = None
+        self._world_name = world_name
+        self._concert_name = concert_name
         self._processes = []
         self._temporary_files = []
 
@@ -60,10 +62,10 @@ class GazeboRobotManager:
         try:
             self._terminal = rocon_launch.create_terminal()
         except (rocon_launch.UnsupportedTerminal, rocon_python_comms.NotFoundException) as e:
-            rospy.logwarn("Turtle Herder : cannot find a suitable terminal, falling back to spawning inside the current one [%s]" % str(e))
+            self.logwarn('cannot find a suitable terminal, falling back to spawning inside the current one [%s]' % str(e))
             self._terminal = rocon_launch.create_terminal(rocon_launch.terminals.active)
 
-    def _spawn_simulated_robots(self, robots):
+    def _spawn_simulated_robots(self, robots, robot_managers):
         """
         Names and locations of robots to be spawned, read from a parameter file.
 
@@ -77,22 +79,23 @@ class GazeboRobotManager:
         """
         for robot in robots:
             try:
-                self.robot_manager.spawn_robot(robot["name"], robot["location"])
+                args = robot['args'] if 'args' in robot else None
+                robot_managers[robot['type']].spawn_robot(robot["name"], robot["location"], args)
                 self.robots.append(robot["name"])
             # TODO add failure exception
             except rospy.ROSInterruptException:
-                rospy.loginfo("GazeboRobotManager : shutdown while spawning robot")
+                self.loginfo("shutdown while spawning robot")
                 continue
 
-    def _launch_robot_clients(self, robot_names):
+    def _launch_robot_clients(self, robots):
         """
         Spawn concert clients for given named robot.
 
         :param robot_names str[]: Names of all robots.
         """
         # spawn the concert clients
-        rocon_launch_text = self.robot_manager.prepare_rocon_launch_text(robot_names)
-        rospy.loginfo("GazeboRobotManager : constructing robot client rocon launcher")
+        rocon_launch_text = self._prepare_rocon_launch_text(robots)
+        self.loginfo("constructing robot client rocon launcher")
         #print("\n" + console.green + rocon_launch_text + console.reset)
         temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         temp.write(rocon_launch_text)
@@ -101,15 +104,29 @@ class GazeboRobotManager:
         try:
             os.unlink(temp.name)
         except OSError:
-            rospy.logerr("GazeboRobotManager : failed to unlink the rocon launcher.")
+            self.logerr("failed to unlink the rocon launcher.")
 
         for launch_configuration in launch_configurations:
-            rospy.loginfo("GazeboRobotManager : launching concert client %s on port %s" %
+            self.loginfo("launching concert client %s on port %s" %
                       (launch_configuration.name, launch_configuration.port))
             #print("%s" % launch_configuration)
             process, meta_roslauncher = self._terminal.spawn_roslaunch_window(launch_configuration)
             self._processes.append(process)
             self._temporary_files.append(meta_roslauncher)
+
+    def _prepare_rocon_launch_text(self, robots):
+        port = 11411
+        launch_text  = '<concert>\n'
+        for robot in robots:
+            launch_text += '  <launch title="%s:4%s" package="concert_service_gazebo" name="robot.launch" port="%s">\n'%(name, str(port), str(port))
+            launch_text += '    <arg name="robot_name" value="%s"/>\n' % robot['name']
+            launch_text += '    <arg name="robot_concert_whitelist" value="%s"/>\n' % self._concert_name 
+            launch_text += '    <arg name="robot_rapp_whitelist" value="%s"/>\n' % str(robot['robot_rapp_whitelist'])
+            launch_text += '  </launch>'
+            port = port + 1
+        launch_text += '</concert>\n'
+
+        return launch_text
 
     def _establish_unique_names(self, robots):
         """
@@ -120,7 +137,7 @@ class GazeboRobotManager:
         :param robots list of dicts[]: The parameter file defining robots and
             start locations. For a full description, see
             _spawn_simulated_robots().
-        :return str[]: uniquified names for the concert clients.
+        :return [dict]: uniquified names for the concert clients.
         """
         unique_robots = []
         unique_robot_names = []
@@ -136,9 +153,9 @@ class GazeboRobotManager:
             robot_copy = copy.deepcopy(robot)
             robot_copy["name"] = robot_name + name_extension
             unique_robots.append(robot_copy)
-        return unique_robots, unique_robot_names
+        return unique_robots
 
-    def _send_flip_rules(self, robot_names, cancel):
+    def _send_flip_rules(self, robots, cancel):
         """
         Flip rules from Gazebo to the robot's concert client.
 
@@ -146,8 +163,8 @@ class GazeboRobotManager:
             be flipped.
         :param cancel bool: Cancel existing flips. Used during shutdown.
         """
-        for robot_name in robot_names:
-            rules = self.robot_manager.get_flip_rule_list(robot_name)
+        for robot in robots:
+            rules = self.robot_managers[robot['type']].get_flip_rule_list()
             # send the request
             request = gateway_srvs.RemoteRequest()
             request.cancel = cancel
@@ -159,26 +176,38 @@ class GazeboRobotManager:
             try:
                 self._gateway_flip_service(request)
             except rospy.ServiceException:  # communication failed
-                rospy.logerr("GazeboRobotManager : failed to send flip rules")
+                self.logerr('failed to send flip rules')
                 return
             except rospy.ROSInterruptException:
-                rospy.loginfo("GazeboRobotManager : shutdown while contacting the gateway flip service")
+                self.loginfo('shutdown while contacting the gateway flip service')
                 return
 
-    def spawn_robots(self, robots):
+    def spawn_robots(self, robots, robot_types):
         """
         Ensure all robots have existing names, spawn robots in gazebo, launch
         concert clients, and flip necessary information from gazebo to each
         concert client.
 
-        :param robots list of dicts[]: The parameter file defining robots and
+        :param robots list of dicts[]: The parameter file defining robots, type and
             start locations. For a full description, see
             _spawn_simulated_robots().
+        :type robots: [{name: str, type: str, location: (x,y,theta)}]
+        :param robot_types: Spawnable robots' information
+        :type robot_types: [{name: str, launch: <package>/<.launch>}]
         """
-        unique_robots, unique_robot_names = self._establish_unique_names(robots)
-        self._spawn_simulated_robots(unique_robots)
-        self._launch_robot_clients(unique_robot_names)
-        self._send_flip_rules(unique_robot_names, cancel=False)
+        unique_robots = self._establish_unique_names(robots)
+        self._robot_managers = prepare_robot_managers(robot_types, self._world_name)
+        self._spawn_simulated_robots(unique_robots, self._robot_managers)
+        self._launch_robot_clients(unique_robots)
+        self._send_flip_rules(self._robot_managers, unique_robots, cancel=False)
+
+    def spin(self):
+        try:
+            while not rospy.is_shutdown() and not gazebo_manager.is_disabled:
+                rospy.sleep(0.3)
+        except rospy.ROSInterruptException:
+            pass
+        self.shutdown()
 
     def shutdown(self):
         """
@@ -200,4 +229,13 @@ class GazeboRobotManager:
             try:
                 os.unlink(temporary_file.name)
             except OSError as e:
-                rospy.logerr("GazeboRobotManager : failed to unlink temporary file [%s]" % str(e))
+                self.logerr('failed to unlink temporary file [%s]' % str(e))
+
+    def loginfo(self, msg):
+        rospy.loginfo('GazeboRobotManager : %s'%str(msg))
+
+    def logerr(self, msg):
+        rospy.logerr('GazeboRobotManager : %s'%str(msg))
+
+    def logwarn(self, msg):
+        rospy.logwarn('GazeboRobotManager : %s'%str(msg))
