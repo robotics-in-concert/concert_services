@@ -45,9 +45,9 @@ class RobotManager(object):
     def delete_robot(self, name):
         delete_model_srv_req = gazebo_srvs.DeleteModelRequest(name)
         try:
-            self.processes[name].terminate()
+            self._processes[name].terminate()
             self._srv['delete_model'](delete_model_srv_req)
-        except rospy.ServiceExceptin: # Communication failed
+        except rospy.ServiceException: # Communication failed
             rospy.logerr('GazeboRobotManager : unable to delete model %s' % name)
 
     def get_flip_rule_list(self):

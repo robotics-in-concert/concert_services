@@ -70,7 +70,7 @@ class GazeboRobotManager:
         self._concert_name = concert_name
         self._processes = []
         self._temporary_files = []
-        self.robots = []
+        self._robots = []
 
         # Gateway
         gateway_namespace = rocon_gateway_utils.resolve_local_gateway()
@@ -100,7 +100,7 @@ class GazeboRobotManager:
             try:
                 args = robot['args'] if 'args' in robot else None
                 robot_managers[robot['type']].spawn_robot(robot["name"], robot["location"], args)
-                self.robots.append(robot["name"])
+                self._robots.append(robot["name"])
             # TODO add failure exception
             except rospy.ROSInterruptException:
                 self.loginfo("shutdown while spawning robot")
@@ -165,7 +165,7 @@ class GazeboRobotManager:
             name_extension = ''
             count = 0
             while (robot_name + name_extension in unique_robot_names or
-                   robot_name + name_extension in self.robots):
+                   robot_name + name_extension in self._robots):
                 name_extension = str(count)
                 count = count + 1
             unique_robot_names.append(robot_name + name_extension)
@@ -219,6 +219,7 @@ class GazeboRobotManager:
         self._spawn_simulated_robots(unique_robots, self._robot_managers)
         self._launch_robot_clients(unique_robots)
         self._send_flip_rules(unique_robots, cancel=False)
+        self._robots = unique_robots
 
     def spin(self):
         try:
@@ -234,9 +235,9 @@ class GazeboRobotManager:
           - Cleanup robots in gazebo.
           - Shutdown spawned terminals.
         """
-        for name in self.robots:
+        for robot in self._robots:
             try:
-                self.robot_manager.delete_robot(name)
+                self._robot_managers[robot['type']].delete_robot(robot['name'])
                 #TODO quitely fail exception here
             except rospy.ROSInterruptException:
                 break  # quietly fail
