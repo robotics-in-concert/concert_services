@@ -2,8 +2,8 @@
 Changelog for package concert_service_teleop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2014-08-26)
+------------------
 * teleop service uses video_teleop
 * update publisher queue_size to avoid warning in indigo.
 * specify capture timeout as a parameter for concert teleop.
