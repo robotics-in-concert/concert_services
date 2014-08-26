@@ -14,7 +14,24 @@ robots:
 types:
   - name: kobuki 
     launch: concert_service_gazebo/kobuki.launch
+    flip_rule:
+      pub:
+        - odom
+      sub:
+        - mobile_base/commands/velocity
+        - mobile_base/commands/motor_power
   - name: turtlebot
     launch: concert_service_gazebo/turtlebot.launch
+    flip_rule:
+      pub:
+        - odom
+      sub:
+        - mobile_base/commands/velocity
+        - mobile_base/commands/motor_power
   - name: segbot
     launch: concert_service_gazebo/segbot.launch 
+    flip_rule:
+      pub:
+        - odom
+      sub:
+        - cmd_vel

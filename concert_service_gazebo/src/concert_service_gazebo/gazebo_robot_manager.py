@@ -182,8 +182,10 @@ class GazeboRobotManager:
             be flipped.
         :param cancel bool: Cancel existing flips. Used during shutdown.
         """
+        rospy.logwarn(str(robots))
         for robot in robots:
-            rules = self._robot_managers[robot['type']].get_flip_rule_list()
+            rules = self._robot_managers[robot['type']].get_flip_rule_list(robot['name'])
+            rospy.logwarn(str(rules))
             # send the request
             request = gateway_srvs.RemoteRequest()
             request.cancel = cancel
