@@ -147,6 +147,7 @@ class TeleopPimp:
                 resource.id = unique_id.toMsg(unique_id.fromRandom())
                 resource.rapp = 'rocon_apps/video_teleop'
                 resource.uri = msg.rocon_uri
+                resource.parameters = [rocon_std_msgs.KeyValue('name',r.uri)]
                 resource_request_id = self.requester.new_request([resource], priority=self.service_priority)
                 #rospy.logwarn("DJS : resource request id of new request [%s]" % resource_request_id)
                 self.pending_requests.append(resource_request_id)

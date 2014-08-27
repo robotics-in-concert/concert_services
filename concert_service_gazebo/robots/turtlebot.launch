@@ -41,7 +41,7 @@
   <!-- Velocity muxer -->
   <node pkg="nodelet" type="nodelet" name="$(arg base_prefix)_nodelet_manager" args="manager"/>
   <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
-        args="load yocs_cmd_vel_mux/CmdVelMuxNodelet $(arg base_prefix)_base_nodelet_manager">
+        args="load yocs_cmd_vel_mux/CmdVelMuxNodelet $(arg base_prefix)_nodelet_manager">
     <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
     <remap from="cmd_vel_mux/output" to="$(arg base_prefix)/commands/velocity"/>
   </node>

@@ -139,6 +139,7 @@ class GazeboRobotManager:
         for robot in robots:
             launch_text += '  <launch title="%s:%s" package="concert_service_gazebo" name="robot.launch" port="%s">\n'%(robot['name'], str(port), str(port))
             launch_text += '    <arg name="robot_name" value="%s"/>\n' % robot['name']
+            launch_text += '    <arg name="robot_type" value="%s"/>\n' % robot['type'] 
             launch_text += '    <arg name="robot_concert_whitelist" value="%s"/>\n' % self._concert_name 
             launch_text += '    <arg name="robot_rapp_whitelist" value="%s"/>\n' % str(robot['robot_rapp_whitelist'])
             launch_text += '  </launch>'
@@ -182,10 +183,8 @@ class GazeboRobotManager:
             be flipped.
         :param cancel bool: Cancel existing flips. Used during shutdown.
         """
-        rospy.logwarn(str(robots))
         for robot in robots:
             rules = self._robot_managers[robot['type']].get_flip_rule_list(robot['name'])
-            rospy.logwarn(str(rules))
             # send the request
             request = gateway_srvs.RemoteRequest()
             request.cancel = cancel
