@@ -3,8 +3,6 @@
     Right now, the android app is hard coded to look for /cmd_vel as the input
     topic.
    -->
-  <arg name="name" default="mobile_base"/>
-  
   <!-- Relay for image -->                                                           
   <param name="camera/rgb/image_color/compressed/jpeg_quality" value="22"/>
   <node pkg="topic_tools" type="throttle" name="relay_compressed_throttle_image" args="messages camera/rgb/image_raw/compressed 5 /teleop/compressed_image" required="true">
