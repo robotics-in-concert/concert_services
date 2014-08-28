@@ -1,0 +1,22 @@
+<launch>
+  <!--  
+    Right now, the android app is hard coded to look for /cmd_vel as the input
+    topic.
+   -->
+  <arg name="name" default="mobile_base"/>
+  
+  <!-- Relay for image -->                                                           
+  <param name="camera/rgb/image_color/compressed/jpeg_quality" value="22"/>
+  <node pkg="topic_tools" type="throttle" name="relay_compressed_throttle_image" args="messages camera/rgb/image_raw/compressed 5 /teleop/compressed_image" required="true">
+    <param name="lazy" value="false"/>
+  </node>
+
+
+  <!-- relay in topic_tools package does not work with multimaster.. -->
+  <node pkg="concert_service_gazebo" name="cmd_vel_relay" type="topic_relay" args="/teleop/cmd_vel cmd_vel_mux/input/teleop geometry_msgs/Twist">
+  </node>
+
+  <node pkg="concert_service_gazebo" name="image_relay" type="topic_relay" args="camera/rgb/image_raw/compressed /teleop/compressed_image sensor_msgs/CompressedImage">
+  </node>
+
+</launch>

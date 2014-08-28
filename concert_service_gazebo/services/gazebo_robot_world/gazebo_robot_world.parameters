@@ -1,16 +1,16 @@
 robots:
-#  - name: guimul
-#    type: kobuki
-#    robot_rapp_whitelist: [rocon_apps, kobuki_rapps]
-#    location: [0.0, 0.0, 0.0]
+  - name: guimul
+    type: kobuki
+    robot_rapp_whitelist: [rocon_apps, concert_service_gazebo]
+    location: [0.0, 0.0, 0.0]
   - name: gamza 
-    type: turtlebot 
-    robot_rapp_whitelist: [rocon_apps, turtlebot_rapps]
+    type: turtlebot
+    robot_rapp_whitelist: [rocon_apps, concert_service_gazebo]
     location: [0.0, -2.0, 3.14159265359]
-#  - name: doldol
-#    type: segbot
-#    robot_rapp_whitelist: [rocon_apps, segbot_rapps]
-#    location: [0.0, 4.0, 0.0]
+  - name: doldol
+    type: segbot
+    robot_rapp_whitelist: [rocon_apps, concert_service_gazebo]
+    location: [0.0, 4.0, 0.0]
 types:
   - name: kobuki 
     launch: concert_service_gazebo/kobuki.launch
@@ -26,7 +26,7 @@ types:
         - odom
         - camera/.*
       sub:
-        - mobile_base/.*
+        - cmd_vel_mux/.*
   - name: segbot
     launch: concert_service_gazebo/segbot.launch 
     flip_rule:
