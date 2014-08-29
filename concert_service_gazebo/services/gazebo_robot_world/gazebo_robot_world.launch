@@ -10,7 +10,9 @@
   <arg if="$(arg debug)" name="gazebo_binary" value="debug"/>
 
   <!-- Start World -->
-  <node name="$(arg world)" pkg="gazebo_ros" type="$(arg gazebo_binary)" args="$(find concert_service_gazebo)/worlds/empty_world.world" respawn="false" output="screen">
+  <node name="gazebo_launcher" pkg="concert_service_gazebo" type="gazebo_launcher.py" respawn="false" output="screen">
+    <param name="world" value="$(arg world)"/>
+    <param name="gazebo_binary" value="$(arg gazebo_binary)"/>
   </node>
 
   <!-- Viewer -->

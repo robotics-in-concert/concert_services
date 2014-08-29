@@ -25,6 +25,7 @@ types:
       pub:
         - odom
         - camera/.*
+        - scan
       sub:
         - cmd_vel_mux/.*
   - name: segbot
@@ -35,3 +36,5 @@ types:
         - scan_filtered
       sub:
         - cmd_vel
+
+world_file: concert_service_gazebo/empty_world.world
