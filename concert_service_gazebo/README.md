@@ -64,6 +64,7 @@ types:
         - scan_filtered
       sub:
         - cmd_vel
+world_file: concert_service_gazebo/empty_world.world
 ```
 
 
@@ -78,5 +79,10 @@ Take a look at the [gazebo_solution](https://github.com/robotics-in-concert/roco
 * Run the demo:
 ```
 > roslaunch gazebo_solution concert.launch --screen
+> rocon_remocon # Teleop..
+```
+
+```
+> roslaunch office_sim_solution concert.launch --screen
 > rocon_remocon # Teleop..
 ```
