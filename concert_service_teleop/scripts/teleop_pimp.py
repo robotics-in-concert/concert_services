@@ -153,7 +153,7 @@ class TeleopPimp:
                 resource.id = unique_id.toMsg(unique_id.fromRandom())
                 resource.rapp = 'rocon_apps/video_teleop'
                 resource.uri = msg.rocon_uri
-                cmd_vel_remapped, compressed_image_topic_remapped = self._get_remapped_topic(rocon_uri.parse(r.uri).name.string)
+                cmd_vel_remapped, compressed_image_topic_remapped = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
                 resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped)]
                 resource.parameters = [rocon_std_msgs.KeyValue('name',r.uri)]
                 resource_request_id = self.requester.new_request([resource], priority=self.service_priority)
