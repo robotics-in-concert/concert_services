@@ -24,6 +24,7 @@ import time
 
 import rospy
 import rocon_python_comms
+import rocon_uri
 import concert_service_utilities
 import concert_scheduler_requests
 import unique_id
@@ -54,9 +55,14 @@ class TeleopPimp:
         'lock',
         'pending_requests',   # a list of request id's pending feedback from the scheduler
         'allocated_requests'  # dic of { rocon uri : request id } for captured teleop robots.
+        '_default_cmd_vel_topic'
+        '_default_compressed_image_topic'
     ]
 
     def __init__(self):
+        self._default_cmd_vel_topic = '/teleop/cmd_vel'
+        self._default_compressed_image_topic = '/teleop/compressed_image'
+
         ####################
         # Discovery
         ####################
@@ -147,6 +153,8 @@ class TeleopPimp:
                 resource.id = unique_id.toMsg(unique_id.fromRandom())
                 resource.rapp = 'rocon_apps/video_teleop'
                 resource.uri = msg.rocon_uri
+                cmd_vel_remapped, compressed_image_topic_remapped = self._get_remapped_topic(rocon_uri.parse(r.uri).name.string)
+                resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped)]
                 resource.parameters = [rocon_std_msgs.KeyValue('name',r.uri)]
                 resource_request_id = self.requester.new_request([resource], priority=self.service_priority)
                 #rospy.logwarn("DJS : resource request id of new request [%s]" % resource_request_id)
@@ -164,6 +172,8 @@ class TeleopPimp:
                     self.requester.rset[resource_request_id].cancel()
                 else:
                     rospy.loginfo("TeleopPimp : captured teleopable robot [%s][%s]" % (msg.rocon_uri, self.allocated_requests[msg.rocon_uri]))
+                    response.cmd_vel_topic = cmd_vel_remapped
+                    response.compressed_image_topic = compressed_image_topic_remapped
                 self.allocate_teleop_service_pair_server.reply(request_id, response)
         else:  # we're releasing
             if msg.rocon_uri in self.allocated_requests.keys():
@@ -203,6 +213,16 @@ class TeleopPimp:
         self.requester.cancel_all()
         self.requester.send_requests()
         #self.lock.release()
+
+    def _get_remapped_topic(self, name):
+        '''
+          Sets up remapping rules for Rapp configuration
+        '''
+        cmd_vel_remapped = '/' + name + self._default_cmd_vel_topic
+        compressed_image_topic_remapped = '/' + name + self._default_compressed_image_topic
+
+        return cmd_vel_remapped, compressed_image_topic_remapped 
+        
 
 ##############################################################################
 # Launch point
