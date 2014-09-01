@@ -66,4 +66,7 @@ class RobotManager(object):
                 for topic in self._flip_rules[key]:
                     r = Rule(typ, name + '/' + topic, None)
                     rules.append(r)
+        
+        # Add clock
+        rules.append(Rule(ConnectionType.PUBLISHER, '/clock', None))
         return rules

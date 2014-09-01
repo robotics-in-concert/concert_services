@@ -26,6 +26,7 @@ types:
         - odom
         - camera/.*
         - scan
+        - mobile_base/.*
       sub:
         - cmd_vel_mux/.*
   - name: segbot
