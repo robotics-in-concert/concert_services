@@ -64,9 +64,13 @@ class RobotManager(object):
         for key, typ in flip.items():
              if key in self._flip_rules:
                 for topic in self._flip_rules[key]:
-                    r = Rule(typ, name + '/' + topic, None)
+                    if topic.startswith('/'):
+                        r = Rule(typ, topic, None)
+                    else:
+                        r = Rule(typ, name + '/' + topic, None)
                     rules.append(r)
         
-        # Add clock
+        # flips tf and clock by default
         rules.append(Rule(ConnectionType.PUBLISHER, '/clock', None))
+        rules.append(Rule(ConnectionType.PUBLISHER, '/tf', None))
         return rules

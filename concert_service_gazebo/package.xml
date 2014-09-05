@@ -29,6 +29,8 @@
     <rocon_app>rapps/turtlebot/video_teleop/turtlebot_video_teleop.rapp</rocon_app>
     <rocon_app>rapps/kobuki/teleop_sim/kobuki_video_teleop.rapp</rocon_app>
     <rocon_app>rapps/segbot/teleop_sim/segbot_video_teleop.rapp</rocon_app>
+
+    <rocon_app>rapps/turtlebot/make_a_map/make_a_map.rapp</rocon_app>
     <concert_service>services/gazebo_robot_world/gazebo_robot_world.service</concert_service>
   </export>
 
