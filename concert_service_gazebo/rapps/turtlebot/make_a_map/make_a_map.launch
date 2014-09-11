@@ -1,0 +1,19 @@
+<launch>
+  <arg name="application_namespace"/>
+  <!-- *********************** Teleoperation ********************** -->
+  <param name="camera/rgb/image_color/compressed/jpeg_quality" value="22"/>
+
+  <!-- Make a slower camera feed available. -->
+  <node pkg="topic_tools" type="throttle" name="camera_throttle" args="messages camera/rgb/image_color/compressed 5"/>
+
+  <!-- *************************** Navi *************************** -->
+  <include file="$(find concert_service_gazebo)/rapps/turtlebot/make_a_map/gmapping.launch.xml">
+    <arg name="namespace" value="$(arg application_namespace)"/>
+  </include>
+
+  <!-- relay in topic_tools package does not work with multimaster.. -->
+  <node pkg="concert_service_gazebo" name="cmd_vel_relay" type="topic_relay" args="/teleop/cmd_vel cmd_vel_mux/input/teleop geometry_msgs/Twist">  </node>
+  <node pkg="concert_service_gazebo" name="image_relay" type="topic_relay" args="camera/rgb/image_raw/compressed /teleop/compressed_image sensor_msgs/CompressedImage">  </node>
+  <node pkg="concert_service_gazebo" name="scan_relay" type="topic_relay" args="scan /make_a_map/scan sensor_msgs/LaserScan">  </node>
+
+</launch>

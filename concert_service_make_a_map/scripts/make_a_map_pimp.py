@@ -7,7 +7,7 @@
 # About
 ##############################################################################
 
-# Simple script to pimp out teleop operations for rocon interactions.
+# Simple script to pimp out make a map operations for rocon interactions.
 #
 # - watch the app manager status and when it has a remote controller,
 # - flip a spawn/kill pair across
@@ -27,10 +27,12 @@ import scheduler_msgs.msg as scheduler_msgs
 import concert_service_msgs.msg as concert_service_msgs
 
 
-class TeleopPimp(concert_service_utilities.ResourcePimp):
+class MakeAMapPimp(concert_service_utilities.ResourcePimp):
 
     _default_cmd_vel_topic = '/teleop/cmd_vel'
     _default_compressed_image_topic = '/teleop/compressed_image'
+    _default_map_topic = 'map'
+    _default_scan_topic = 'scan'
 
     def setup_variables(self): 
         '''
@@ -40,9 +42,9 @@ class TeleopPimp(concert_service_utilities.ResourcePimp):
         (service_name, service_description, service_priority, service_id) = concert_service_utilities.get_service_info()
         self.service_priority = service_priority
         self.service_id = service_id
-        self.resource_type = 'rocon_apps/video_teleop'
-        self.available_resource_publisher_name = 'available_teleops'
-        self.capture_topic_name = 'capture_teleop'
+        self.resource_type = 'concert_service_gazebo/make_a_map'
+        self.available_resource_publisher_name = 'available_make_a_map'
+        self.capture_topic_name = 'capture_make_a_map'
 
     def ros_capture_callback(self, request_id, msg):
         '''
@@ -79,8 +81,8 @@ class TeleopPimp(concert_service_utilities.ResourcePimp):
         resource.id = unique_id.toMsg(unique_id.fromRandom())
         resource.rapp = self.resource_type
         resource.uri = uri
-        cmd_vel_remapped, compressed_image_topic_remapped = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
-        resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped)]
+        cmd_vel_remapped, compressed_image_topic_remapped, map_remapped, scan_remapped  = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
+        resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped), rocon_std_msgs.Remapping(self._default_map_topic, map_remapped), rocon_std_msgs.Remapping(self._default_scan_topic, scan_remapped)]
         return resource
 
     def _get_remapped_topic(self, name):
@@ -89,17 +91,19 @@ class TeleopPimp(concert_service_utilities.ResourcePimp):
         '''
         cmd_vel_remapped = '/' + name + self._default_cmd_vel_topic
         compressed_image_topic_remapped = '/' + name + self._default_compressed_image_topic
+        map_remapped = '/' + name + '/' + self._default_map_topic
+        scan_remapped = '/' + name + '/' + self._default_scan_topic
 
-        return cmd_vel_remapped, compressed_image_topic_remapped 
+        return cmd_vel_remapped, compressed_image_topic_remapped,map_remapped, scan_remapped 
 
     def loginfo(self, msg):
-        rospy.loginfo("TeleopPimp : %s"%str(msg))
+        rospy.loginfo("MakeAMapPimp : %s"%str(msg))
 
     def logwarn(self, msg):
-        rospy.logwarn("TeleopPimp : %s"%str(msg))
+        rospy.logwarn("MakeAMapPimp : %s"%str(msg))
 
     def logerr(self, msg):
-        rospy.logerr("TeleopPimp : %s"%str(msg))
+        rospy.logerr("MakeAMapPimp : %s"%str(msg))
 
 
 ##############################################################################
@@ -107,8 +111,8 @@ class TeleopPimp(concert_service_utilities.ResourcePimp):
 ##############################################################################
 
 if __name__ == '__main__':
-    rospy.init_node('teleop_pimp')
-    pimp = TeleopPimp()
+    rospy.init_node('make_a_map_pimp')
+    pimp = MakeAMapPimp()
     rospy.spin()
     if not rospy.is_shutdown():
         pimp.cancel_all_requests()

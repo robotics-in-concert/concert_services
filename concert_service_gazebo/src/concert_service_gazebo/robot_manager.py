@@ -7,71 +7,70 @@
 # About
 ##############################################################################
 
-# Abstract base class that defines the API of a robot-specific module needs to
+# Base class that defines the API of a robot-specific module needs to
 # be defined. This robot specific module will be used by GazeboRobotManager to
 # spawn and kill robots in gazebo.
 
-##############################################################################
-# Imports
-##############################################################################
-
-from abc import ABCMeta, abstractmethod
+import rospy
+import rocon_python_utils
+import gazebo_msgs.srv as gazebo_srvs
+from gateway_msgs.msg import Rule, ConnectionType
+from .utils import reformat_position_vector, generate_spawn_robot_launch_script, start_roslaunch_process 
 
 class RobotManager(object):
-    '''
-      Abstract base class that defines the API of a robot specific manager.
-    '''
-    __metaclass__ = ABCMeta
 
-    @abstractmethod
-    def spawn_robot(self, name, position_vector):
-        """
-        Spawn a robot in gazebo with a given name and location.
+    __slots__ = ['_robot_type', '_launch', '_world_namespace', '_processes', '_srv', '_flip_rules']
+    
+    def __init__(self, robot_type, world_namespace):
+        self._robot_type = robot_type['name']
+        self._flip_rules = robot_type['flip_rule']
+        self._launch = rocon_python_utils.ros.find_resource_from_string(robot_type['launch'])
+        self._world_namespace = world_namespace
+        self._processes = {}
+        self._srv = {}
 
-        :param name str: The robot's name.
-        :param position_vector float[]: The location at which the robot needs to
-            be spawned. Can be specified as [x,y], [x,y,yaw], or
-            [x,y,z,roll,pitch,yaw]. If list length is different from these 3,
-            then the behavior is not defined (but an exception is not thrown).
-        """
-        pass
+        self._setup_gazebo_api()
 
-    @abstractmethod
-    def delete_robot(self, name): 
-        """
-        Delete a previously spawned robot from gazebo.
+    def _setup_gazebo_api(self):
+        delete_model_srv_name = self._world_namespace + '/delete_model'
+        rospy.wait_for_service(delete_model_srv_name)
+        
+        self._srv['delete_model'] = rospy.ServiceProxy(delete_model_srv_name, gazebo_srvs.DeleteModel)
 
-        :param name str: The robot's name.
-        """
-        pass
+    def spawn_robot(self, name, position_vector, args=None):
+        location = reformat_position_vector(position_vector)
+        launch_script = generate_spawn_robot_launch_script(name, location, self._world_namespace, self._launch, args)
+        self._processes[name] = start_roslaunch_process(launch_script)
 
-    @abstractmethod
-    def prepare_rocon_launch_text(self, robots): 
-        """
-        Prepare the concert client text for robot(s). This allows you to fine
-        tune the concert client that will come up for this robot. A good way of
-        doing so is to wrap robot.launch in concert_service_gazebo with a 
-        concert launcher with a whitelist of concert names, as well as the 
-        packages from which rapps should be loaded into this client. 
-
-        :param robots str[]: Names of robots for whom clients needs to be 
-            generated. All the clients can be bundled into a single concert
-            launcher
-        :return str: The concert launch text (i.e rocon_launch text)
-        """
-        return ""
+    def delete_robot(self, name):
+        delete_model_srv_req = gazebo_srvs.DeleteModelRequest(name)
+        try:
+            self._processes[name].terminate()
+            self._srv['delete_model'](delete_model_srv_req)
+        except rospy.ServiceException: # Communication failed
+            rospy.logerr('GazeboRobotManager : unable to delete model %s' % name)
 
     def get_flip_rule_list(self, name):
         """
-        A lot of information will have to be flipped from gazebo to each
-        concert client, so that the client can truly control the robot. For
-        instance, if you wish to simply teleoperate the robot, /cmd_vel and
-        /odom should be sufficient. If you want to use full autonomous
-        navigation, you'll also have to flip the map, the sensor data, tf
-        information and clock.
-
-        :param name str: The name of the robot to whom we are flipping info.
-        :return rules gateway_msgs.msg.Rule[]: The rules that need to be flipped
-            to the robot's concert client.
+        Returns flip rules of given robot type
         """
-        return []
+        rules = [] 
+
+        flip = {}
+        flip['pub'] = ConnectionType.PUBLISHER
+        flip['sub'] = ConnectionType.SUBSCRIBER
+        flip['srv'] = ConnectionType.SERVICE
+
+        for key, typ in flip.items():
+             if key in self._flip_rules:
+                for topic in self._flip_rules[key]:
+                    if topic.startswith('/'):
+                        r = Rule(typ, topic, None)
+                    else:
+                        r = Rule(typ, name + '/' + topic, None)
+                    rules.append(r)
+        
+        # flips tf and clock by default
+        rules.append(Rule(ConnectionType.PUBLISHER, '/clock', None))
+        rules.append(Rule(ConnectionType.PUBLISHER, '/tf', None))
+        return rules

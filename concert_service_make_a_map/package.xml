@@ -1,15 +1,15 @@
 <package>
-  <name>concert_service_teleop</name>
+  <name>concert_service_make_a_map</name>
   <version>0.1.1</version>
   <description>
-      Teleop by request from a rocon interactive program.
+      Make a Map by request from a rocon interactive program.
   </description>
-  <maintainer email="d.stonier@gmail.com">Daniel Stonier</maintainer>
+  <maintainer email="jihoonlee.in@gmail.com">Jihoon Lee</maintainer>
   <license>BSD</license>
-  <url type="website">http://ros.org/wiki/concert_service_teleop</url>
+  <url type="website">http://ros.org/wiki/concert_service_make_a_map</url>
   <url type="repository">https://github.com/robotics-in-concert/concert_services</url>
   <url type="bugtracker">https://github.com/robotics-in-concert/concert_services/issues</url>
-  <author>Daniel Stonier</author>
+  <author>Jihoon Lee</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -25,6 +25,6 @@
   <run_depend>unique_id</run_depend>
 
   <export>
-    <concert_service>services/teleop/teleop.service</concert_service>
+    <concert_service>services/make_a_map/make_a_map.service</concert_service>
   </export>
 </package>

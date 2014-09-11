@@ -21,21 +21,68 @@ Unfortunately, a lot of code depends on the robot that you are going to simulate
 * The concert solution and all subsequent concert clients need to be started with /use_sim_time set to true.
 * Since all robots are being simulated on a single master, the tf tree needs tobe properly namespaced for each robot. Furthermore, applications run by this spawned concert clients need to use this namespaced tf tree. 
 
+
+# Robot configuration Parameter
+
+[Example parameter](https://github.com/robotics-in-concert/concert_services/blob/gazebo_upgrade/concert_service_gazebo/services/gazebo_robot_world/gazebo_robot_world.parameters)
+
+```
+robots:
+  - name: guimul
+    type: kobuki
+    robot_rapp_whitelist: [rocon_apps, concert_service_gazebo]
+    location: [0.0, 0.0, 0.0]
+  - name: gamza 
+    type: turtlebot
+    robot_rapp_whitelist: [rocon_apps, concert_service_gazebo]
+    location: [0.0, -2.0, 3.14159265359]
+  - name: doldol
+    type: segbot
+    robot_rapp_whitelist: [rocon_apps, concert_service_gazebo]
+    location: [0.0, 4.0, 0.0]
+types:
+  - name: kobuki 
+    launch: concert_service_gazebo/kobuki.launch
+    flip_rule:
+      pub:
+        - odom
+      sub:
+        - mobile_base/.*
+  - name: turtlebot
+    launch: concert_service_gazebo/turtlebot.launch
+    flip_rule:
+      pub:
+        - odom
+        - camera/.*
+      sub:
+        - cmd_vel_mux/.*
+  - name: segbot
+    launch: concert_service_gazebo/segbot.launch 
+    flip_rule:
+      pub:
+        - odom
+        - scan_filtered
+      sub:
+        - cmd_vel
+world_file: concert_service_gazebo/empty_world.world
+```
+
+
 # An example
 
-Take a look at the [segbot_gazebo_concert](https://github.com/utexas-bwi/segbot_rocon/tree/master/segbot_gazebo_concert) demo.
+Take a look at the [gazebo_solution](https://github.com/robotics-in-concert/rocon_demos/tree/gazebo_concert/gazebo_solution) demo.
 
-* Install all the UTexas code:
-```
-sudo apt-get install ros-hydro-segbot* ros-hydro-bwi*
-```
-* Install the UTexas Rocon code using this rosinstall entry:
-```
-- git: {local-name: segbot_rocon, uri: 'https://github.com/utexas-bwi/segbot_rocon.git'}
-```
+* Install Rocon:
+
+> wstool init . https://raw.githubusercontent.com/robotics-in-concert/rocon_demos/gazebo_concert/gazebo_solution.rosinstall
+
 * Run the demo:
 ```
-rocon_launch segbot_gazebo_concert gazebo.concert --screen
+> roslaunch gazebo_solution concert.launch --screen
+> rocon_remocon # Teleop..
 ```
 
-The implementation for RobotManager for the Segbot can be found in the [concert_service_segbot_gazebo](https://github.com/utexas-bwi/segbot_rocon/tree/master/concert_service_segbot_gazebo) repository.
+```
+> roslaunch office_sim_solution concert.launch --screen
+> rocon_remocon # Teleop..
+```
