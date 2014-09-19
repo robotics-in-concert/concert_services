@@ -5,15 +5,17 @@
    -->
   <arg name="application_namespace" />
 
+  <!-- Robot velocity feedbacks; use the one configured as base default -->
+  <!--
   <node pkg="nodelet" type="nodelet" name="teleop_velocity_smoother_manager" args="manager"/>
   <node pkg="nodelet" type="nodelet" name="teleop_velocity_smoother" args="load yocs_velocity_smoother/VelocitySmootherNodelet teleop_velocity_smoother_manager">
     <rosparam file="$(find turtlebot_bringup)/param/defaults/smoother.yaml" command="load"/>
     <remap from="teleop_velocity_smoother/smooth_cmd_vel" to="cmd_vel_mux/input/teleop"/>
 
-    <!-- Robot velocity feedbacks; use the one configured as base default -->
     <remap from="teleop_velocity_smoother/odometry" to="odom"/>
     <remap from="teleop_velocity_smoother/robot_cmd_vel" to="mobile_base/commands/velocity"/>
   </node>
+  -->
 
   <!-- Relay for image -->                                                           
   <param name="camera/rgb/image_color/compressed/jpeg_quality" value="22"/>
@@ -23,7 +25,7 @@
 
 
   <!-- relay in topic_tools package does not work with multimaster.. -->
-  <node pkg="concert_service_gazebo" name="cmd_vel_relay" type="topic_relay" args="/teleop/cmd_vel teleop_velocity_smoother/raw_cmd_vel geometry_msgs/Twist">
+  <node pkg="concert_service_gazebo" name="cmd_vel_relay" type="topic_relay" args="/teleop/cmd_vel cmd_vel_mux/input/teleop geometry_msgs/Twist">
   </node>
 
   <node pkg="concert_service_gazebo" name="image_relay" type="topic_relay" args="camera/rgb/image_raw/compressed /teleop/compressed_image sensor_msgs/CompressedImage">
