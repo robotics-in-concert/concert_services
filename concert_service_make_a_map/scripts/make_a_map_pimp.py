@@ -96,7 +96,7 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
         map_remapped = '/' + name + '/' + self._default_map_topic
         scan_remapped = '/' + name + self._default_scan_topic
         robot_pose_remapped = '/' + name + '/' + self._default_robot_pose_topic
-        save_map_remapped = rospy.get_namespace() + '/' + self._default_save_map_srv
+        save_map_remapped = rospy.get_namespace()  + self._default_save_map_srv
 
         return cmd_vel_remapped, compressed_image_topic_remapped,map_remapped, scan_remapped, robot_pose_remapped, save_map_remapped
 
