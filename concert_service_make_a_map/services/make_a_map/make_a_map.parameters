@@ -1,4 +1,4 @@
 # Default parameter for teleop service
 allocation_timeout: 15.0
-map_path: "~/"
+map_path: "~/.ros/maps/"
 map_topic: "/map"
