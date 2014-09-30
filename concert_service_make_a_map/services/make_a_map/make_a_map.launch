@@ -1,4 +1,7 @@
 <launch>
   <node pkg="concert_service_make_a_map" type="make_a_map_pimp.py" name="make_a_map_pimp" required="true">
   </node>
+  
+  <node pkg="map_saver" type="map_saver.py" name="map_saver_with_cropped">
+  </node>
 </launch>

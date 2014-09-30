@@ -11,6 +11,11 @@
     <arg name="namespace" value="$(arg application_namespace)"/>
   </include>
 
+  <node pkg="robot_pose_publisher" name="robot_pose_publisher" type="robot_pose_publisher">
+    <param name="is_stamped" value="true"/>
+    <param name="base_frame" value="$(arg application_namespace)/base_footprint"/>
+  </node>
+
   <!-- relay in topic_tools package does not work with multimaster.. -->
   <node pkg="concert_service_gazebo" name="cmd_vel_relay" type="topic_relay" args="/teleop/cmd_vel cmd_vel_mux/input/teleop geometry_msgs/Twist">  </node>
   <node pkg="concert_service_gazebo" name="image_relay" type="topic_relay" args="camera/rgb/image_raw/compressed /teleop/compressed_image sensor_msgs/CompressedImage">  </node>
