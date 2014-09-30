@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>concert_service_world_canvas</name>
+  <version>0.0.0</version>
+  <description>World canvas service</description>
+
+  <maintainer email="jihoonlee.in@gmail.com">Jihoon Lee</maintainer>
+  <author>Jihoon Lee</author>
+
+  <license>BSD</license>
+
+  <url type="website">http://wiki.ros.org/concert_service_world_canvas</url>
+  <url type="repository">https://github.com/robotics-in-concert/concert_services</url>
+  <url type="bugtracker">https://github.com/robotics-in-concert/concert_services/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>world_canvas_server</build_depend>
+  <run_depend>world_canvas_server</run_depend>
+
+  <export>
+    <concert_service>services/world_canvas/world_canvas.service</concert_service>
+  </export>
+</package>

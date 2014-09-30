@@ -1,0 +1,6 @@
+name: World Canvas
+description: Design your own semantic world!
+author: Jihoon Lee
+priority: 1000
+launcher_type: roslaunch
+launcher: office_sim_solution/world_canvas.launch

@@ -1,0 +1,7 @@
+<launch> 
+  <include file="$(find world_canvas_server)/launch/world_canvas_server.launch">
+  </include>
+<!--  <node pkg="concer_service_world_canvas" name="world_canvas_loader" type="world_canvas_loader.py">
+  </node>
+-->
+</launch>
