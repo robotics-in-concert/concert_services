@@ -2,11 +2,11 @@
 # Teleoperations
 ###############################################################################
 
-- name: concert_teleop
+- name: concert_make_a_map
   role: 'User'
   compatibility: rocon:/pc/*/hydro|indigo/*
-  display_name: Concert Teleop
-  description: Select and teleop a robot in the concert
+  display_name: Concert Make a Map 
+  description: Select a robot and make a map in the concert
   max: -1
   parameters:
     maximum_linear_velocity: 2.0
