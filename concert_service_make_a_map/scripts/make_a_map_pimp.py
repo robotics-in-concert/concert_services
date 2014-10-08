@@ -26,7 +26,6 @@ import rocon_std_msgs.msg as rocon_std_msgs
 import scheduler_msgs.msg as scheduler_msgs
 import concert_service_msgs.msg as concert_service_msgs
 
-
 class MakeAMapPimp(concert_service_utilities.ResourcePimp):
 
     _default_cmd_vel_topic = '/teleop/cmd_vel'
@@ -97,7 +96,7 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
         map_remapped = rospy.get_param('map_topic','/map')
         scan_remapped = '/' + name + self._default_scan_topic
         robot_pose_remapped = '/' + name + '/' + self._default_robot_pose_topic
-        wc_namespace_remapped = rospy.get_namespace()  + self._default_wc_namespace
+        wc_namespace_remapped = rospy.get_param('wc_namespace','/')
 
         return cmd_vel_remapped, compressed_image_topic_remapped,map_remapped, scan_remapped, robot_pose_remapped, wc_namespace_remapped
 
