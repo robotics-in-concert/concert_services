@@ -34,7 +34,7 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
     _default_map_topic = 'map'
     _default_scan_topic = '/make_a_map/scan'
     _default_robot_pose_topic = 'robot_pose'
-    _default_save_map_srv = 'save_map'
+    _default_wc_namespace = 'world_canvas'
 
     def setup_variables(self):
         '''
@@ -61,16 +61,16 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
         response.result = False
         if not msg.release:  # i.e. we're capturing:
             if msg.rocon_uri not in [r.uri for r in self.available_resources]:
-                self.logwarn("couldn't capture teleopable robot [not available][%s]" % msg.rocon_uri)
+                self.logwarn("couldn't capture resource [not available][%s]" % msg.rocon_uri)
                 response.result = False
             else:
                 resource = self._create_resource(msg.rocon_uri)
                 request_result, resource_request_id = self.send_allocation_request(resource)
                 response.result = request_result
                 if request_result == False:
-                    self.logwarn("couldn't capture teleopable robot [timed out][%s]" % msg.rocon_uri)
+                    self.logwarn("couldn't capture resource [timed out][%s]" % msg.rocon_uri)
                 else:
-                    self.loginfo("captured teleopable robot [%s][%s]" % (msg.rocon_uri, resource_request_id))
+                    self.loginfo("captured resource [%s][%s]" % (msg.rocon_uri, resource_request_id))
                     response.remappings = resource.remappings
         else:  # we're releasing
             self.send_releasing_request(msg.rocon_uri)
@@ -97,9 +97,9 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
         map_remapped = rospy.get_param('map_topic','/map')
         scan_remapped = '/' + name + self._default_scan_topic
         robot_pose_remapped = '/' + name + '/' + self._default_robot_pose_topic
-        save_map_remapped = rospy.get_namespace()  + self._default_save_map_srv
+        wc_namespace_remapped = rospy.get_namespace()  + self._default_wc_namespace
 
-        return cmd_vel_remapped, compressed_image_topic_remapped,map_remapped, scan_remapped, robot_pose_remapped, save_map_remapped
+        return cmd_vel_remapped, compressed_image_topic_remapped,map_remapped, scan_remapped, robot_pose_remapped, wc_namespace_remapped
 
     def loginfo(self, msg):
         rospy.loginfo("MakeAMapPimp : %s"%str(msg))
