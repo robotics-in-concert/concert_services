@@ -82,8 +82,8 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
         resource.id = unique_id.toMsg(unique_id.fromRandom())
         resource.rapp = self.resource_type
         resource.uri = uri
-        cmd_vel_remapped, compressed_image_topic_remapped, map_remapped, scan_remapped, robot_pose_remapped, save_map_remapped = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
-        resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped), rocon_std_msgs.Remapping(self._default_map_topic, map_remapped), rocon_std_msgs.Remapping(self._default_scan_topic, scan_remapped), rocon_std_msgs.Remapping(self._default_robot_pose_topic, robot_pose_remapped), rocon_std_msgs.Remapping(self._default_save_map_srv, save_map_remapped)]
+        cmd_vel_remapped, compressed_image_topic_remapped, map_remapped, scan_remapped, robot_pose_remapped, wc_namespace_remapped = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
+        resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped), rocon_std_msgs.Remapping(self._default_map_topic, map_remapped), rocon_std_msgs.Remapping(self._default_scan_topic, scan_remapped), rocon_std_msgs.Remapping(self._default_robot_pose_topic, robot_pose_remapped), rocon_std_msgs.Remapping(self._default_wc_namespace, wc_namespace_remapped)]
         return resource
 
     def _get_remapped_topic(self, name):
