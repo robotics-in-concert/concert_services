@@ -1,12 +1,12 @@
 <package>
-  <name>concert_service_make_a_map</name>
+  <name>concert_service_initialisation</name>
   <version>0.1.1</version>
   <description>
-      Make a Map by request from a rocon interactive program.
+      Services to initilise environment. Make a map and annotation
   </description>
   <maintainer email="jihoonlee.in@gmail.com">Jihoon Lee</maintainer>
   <license>BSD</license>
-  <url type="website">http://ros.org/wiki/concert_service_make_a_map</url>
+  <url type="website">http://ros.org/wiki/concert_service_initialisation</url>
   <url type="repository">https://github.com/robotics-in-concert/concert_services</url>
   <url type="bugtracker">https://github.com/robotics-in-concert/concert_services/issues</url>
   <author>Jihoon Lee</author>
@@ -26,5 +26,6 @@
 
   <export>
     <concert_service>services/make_a_map/make_a_map.service</concert_service>
+    <concert_service>services/map_annotation/map_annotation.service</concert_service>
   </export>
 </package>
