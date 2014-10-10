@@ -6,4 +6,3 @@ priority: 10000
 launcher_type: roslaunch
 icon: concert_service_initialisation/map_annotation_bubble_icon.png
 interactions: concert_service_initialisation/map_annotation
-parameters: concert_service_initialisation/map_annotation
