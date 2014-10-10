@@ -27,6 +27,6 @@
   <export>
     <concert_service>services/make_a_map/make_a_map.service</concert_service>
     <concert_service>services/map_annotation/map_annotation.service</concert_service>
-    <concert_service>services/initilisation/initilisation.service</concert_service>
+    <concert_service>services/initialisation/initialisation.service</concert_service>
   </export>
 </package>
