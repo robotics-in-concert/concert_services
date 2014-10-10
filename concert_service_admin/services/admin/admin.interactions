@@ -27,6 +27,7 @@
   description: Generic information about this concert.
   max: -1
 - name: rocon_admin_app
+  role: 'Admin'
   compatibility: rocon:/pc/*/hydro|indigo/precise|quantal|raring|saucy|trusty
   display_name: Concert Service Administration
   description: Configure, enable/disable services
