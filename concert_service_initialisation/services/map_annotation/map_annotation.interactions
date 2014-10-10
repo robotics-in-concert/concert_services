@@ -6,9 +6,7 @@
   role: 'User'
   compatibility: rocon:/pc/*/hydro|indigo/*
   display_name: Concert Map Annotation 
-  description: Select a robot and make a map in the concert
-  max: -1
+  description: Annotates table and global marker
+  max: 1
   parameters:
-    maximum_linear_velocity: 2.0
-    maximum_angular_velocity: 1.57
-    capture_timeout: 15.0
+    wc_namespace: "/"
