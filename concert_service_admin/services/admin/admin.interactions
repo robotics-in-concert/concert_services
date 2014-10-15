@@ -26,7 +26,7 @@
   display_name: Concert Info
   description: Generic information about this concert.
   max: -1
-- name: rocon_admin_app
+- name: concert_admin_app
   role: 'Admin'
   compatibility: rocon:/pc/*/hydro|indigo/precise|quantal|raring|saucy|trusty
   display_name: Concert Service Administration
