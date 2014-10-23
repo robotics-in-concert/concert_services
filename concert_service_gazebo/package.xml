@@ -36,6 +36,8 @@
 
     <concert_gazebo>robots/kobuki/kobuki.concert_gazebo</concert_gazebo>
     <concert_gazebo>robots/turtlebot/turtlebot.concert_gazebo</concert_gazebo>
+    <!-- Segbot example -->
+    <!--<concert_gazebo>robots/segbot/segbot.concert_gazebo</concert_gazebo>-->
   </export>
 
 </package>
