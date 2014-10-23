@@ -20,33 +20,41 @@
 import copy
 import os
 import tempfile
+import yaml
 
 import gateway_msgs.msg as gateway_msgs
 import gateway_msgs.srv as gateway_srvs
+import rocon_std_msgs.msg as rocon_std_msgs
 import rocon_launch
 import rospy
 import rocon_gateway_utils
+import rocon_python_utils
 
 from .robot_manager import RobotManager
 
 ##############################################################################
 # Utility 
 ##############################################################################
-def prepare_robot_managers(robot_types, world_name):
+def prepare_robot_managers(robot_type_locations, world_name):
     """
     Prepare robot manager objects based on its type
     
     :param robot_types: The configurations define robots model launcher in gazebo
     :type robot_types: [{name: robot_type, launch: <package>/<.launch>}]
     
-    :returns: A dict of robot manager 
-    :rtype: {robot_type: RobotManager()}
+    :returns: A dict of robot manager, and a dict of invalid robot manager
+    :rtype: {robot_type: RobotManager()}, {robot_type: reason}
     """
     robot_managers = {}
-    for t in robot_types:
-        robot_managers[t['name']] = RobotManager(t, world_name)
-
-    return robot_managers
+    invalid_robot_managers = {}
+    for name, loc in robot_type_locations.items():
+        try:
+            with open(loc) as f:
+                loaded_robot_type = yaml.load(f)
+                robot_managers[loaded_robot_type['name']] = RobotManager(loaded_robot_type, world_name)
+        except rospkg.ResourceNotFound as e: 
+            invalid_robot_managers[name] = str(e) 
+    return robot_managers, invalid_robot_managers
 
 ##############################################################################
 # Gazebo Robot Manager
@@ -77,12 +85,28 @@ class GazeboRobotManager:
         rospy.wait_for_service(gateway_namespace + '/flip')
         self._gateway_flip_service = rospy.ServiceProxy(gateway_namespace + '/flip', gateway_srvs.Remote)
 
+        # extract spawnable robot types from package exports
+        self._robot_types = self._extract_robot_types()
+
         # Terminal type for spawning
         try:
             self._terminal = rocon_launch.create_terminal()
         except (rocon_launch.UnsupportedTerminal, rocon_python_comms.NotFoundException) as e:
             self.logwarn('cannot find a suitable terminal, falling back to spawning inside the current one [%s]' % str(e))
             self._terminal = rocon_launch.create_terminal(rocon_launch.terminals.active)
+
+    def _extract_robot_types(self):
+        cached_robot_type_information, unused_invalid_robot_types = rocon_python_utils.ros.resource_index_from_package_exports(rocon_std_msgs.Strings.TAG_GAZEBO_ROBOT_TYPE)
+
+        self.loginfo(str(cached_robot_type_information))
+        self._cached_robot_type_locations = {cached_resource_name: cached_filename for cached_resource_name, (cached_filename, unused_catkin_package) in cached_robot_type_information.iteritems()}
+        self._robot_managers, self._invalid_robot_managers = prepare_robot_managers(self._cached_robot_type_locations, self._world_name)
+        self.loginfo(str(self._robot_managers))
+        self.loginfo(str(self._invalid_robot_managers))
+
+        for name, manager in self._robot_managers.items():
+            self.loginfo('%s loaded'%name)
+
 
     def _spawn_simulated_robots(self, robots, robot_managers):
         """
@@ -202,7 +226,7 @@ class GazeboRobotManager:
                 self.loginfo('shutdown while contacting the gateway flip service')
                 return
 
-    def spawn_robots(self, robots, robot_types):
+    def spawn_robots(self, robots):
         """
         Ensure all robots have existing names, spawn robots in gazebo, launch
         concert clients, and flip necessary information from gazebo to each
@@ -212,11 +236,8 @@ class GazeboRobotManager:
             start locations. For a full description, see
             _spawn_simulated_robots().
         :type robots: [{name: str, type: str, location: (x,y,theta)}]
-        :param robot_types: Spawnable robots' information
-        :type robot_types: [{name: str, launch: <package>/<.launch>}]
         """
         unique_robots = self._establish_unique_names(robots)
-        self._robot_managers = prepare_robot_managers(robot_types, self._world_name)
         self._spawn_simulated_robots(unique_robots, self._robot_managers)
         self._launch_robot_clients(unique_robots)
         self._send_flip_rules(unique_robots, cancel=False)
