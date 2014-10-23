@@ -4,7 +4,7 @@
     topic.
    -->
   <!-- relay in topic_tools package does not work with multimaster.. -->
-  <node pkg="concert_service_gazebo" name="cmd_vel_relay" type="topic_relay" args="/teleop/cmd_vel mobile_base/commands/velocity geometry_msgs/Twist">
+  <node pkg="rocon_python_utils" name="cmd_vel_relay" type="topic_relay" args="/teleop/cmd_vel mobile_base/commands/velocity geometry_msgs/Twist">
   </node>
 
 </launch>
