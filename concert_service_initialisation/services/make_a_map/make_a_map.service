@@ -4,7 +4,7 @@ author: Yujin Robot
 # Priority constants are set in scheduler_msgs.Request.XXX_PRIORITY. This should reflect high priority.
 priority: 10000
 launcher_type: roslaunch
-launcher: concert_service_make_a_map/make_a_map
-icon: concert_service_make_a_map/make_a_map_bubble_icon.png
-interactions: concert_service_make_a_map/make_a_map
-parameters: concert_service_make_a_map/make_a_map
+launcher: concert_service_initialisation/make_a_map
+icon: concert_service_initialisation/make_a_map_bubble_icon.png
+interactions: concert_service_initialisation/make_a_map
+parameters: concert_service_initialisation/make_a_map

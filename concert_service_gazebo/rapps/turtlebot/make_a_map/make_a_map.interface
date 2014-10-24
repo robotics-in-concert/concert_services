@@ -7,6 +7,8 @@ publishers:
     type: tf2_msgs/TFMessage
   - name: map
     type: nav_msgs/OccupancyGrid
+  - name: robot_pose
+    type: geometry_msgs/PoseStamped
 subscribers:
   - name: /teleop/cmd_vel 
     type: geometry_msgs/Twist
