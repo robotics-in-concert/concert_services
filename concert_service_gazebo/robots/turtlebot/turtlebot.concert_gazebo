@@ -3,7 +3,7 @@ launch: concert_service_gazebo/turtlebot.launch
 flip_rule:
   pub:
     - odom
-    - camer/.*
+    - camera/.*
     - scan
     - mobile_base/.*
   sub:
