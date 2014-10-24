@@ -21,6 +21,7 @@
     <arg name="robot_unique_name" value="false"/>
     <arg name="local_machine_only" value="true"/>
     <arg name="screen" value="true" />
+    <arg name="sim"    value="true" />
   </include>
 
 </launch>
