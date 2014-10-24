@@ -4,10 +4,10 @@
 robots:
   - name: guimul
     type: kobuki
-    robot_rapp_whitelist: [rocon_apps, concert_service_gazebo]
+    robot_rapp_whitelist: [rocon_apps, kobuki_rapps]
     location: [0.0, 0.0, 0.0]
   - name: gamza 
     type: turtlebot
-    robot_rapp_whitelist: [rocon_apps, concert_service_gazebo]
+    robot_rapp_whitelist: [rocon_apps, turtlebot_rapps]
     location: [0.0, -2.0, 3.14159265359]
-world_file: concert_service_gazebo/empty_world.world
+world_file: concert_service_gazebo/playground.world
