@@ -18,6 +18,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>gateway_msgs</run_depend>
+  <run_depend>rocon_std_msgs</run_depend>
   <run_depend>rocon_console</run_depend>
   <run_depend>rocon_gateway_utils</run_depend>
   <run_depend>rocon_launch</run_depend>
@@ -29,9 +30,14 @@
     <rocon_app>rapps/turtlebot/video_teleop/turtlebot_video_teleop.rapp</rocon_app>
     <rocon_app>rapps/kobuki/teleop_sim/kobuki_video_teleop.rapp</rocon_app>
     <rocon_app>rapps/segbot/teleop_sim/segbot_video_teleop.rapp</rocon_app>
-
     <rocon_app>rapps/turtlebot/make_a_map/make_a_map.rapp</rocon_app>
+
     <concert_service>services/gazebo_robot_world/gazebo_robot_world.service</concert_service>
+
+    <concert_gazebo>robots/kobuki/kobuki.concert_gazebo</concert_gazebo>
+    <concert_gazebo>robots/turtlebot/turtlebot.concert_gazebo</concert_gazebo>
+    <!-- Segbot example -->
+    <!--<concert_gazebo>robots/segbot/segbot.concert_gazebo</concert_gazebo>-->
   </export>
 
 </package>
