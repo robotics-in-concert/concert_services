@@ -1,4 +1,4 @@
 <launch>
-  <node pkg="concert_service_initialisation" type="make_a_map_pimp.py" name="make_a_map_pimp" required="true">
+  <node pkg="concert_service_indoor_2d_map_prep" type="make_a_map_pimp.py" name="make_a_map_pimp" required="true">
   </node>
 </launch>
