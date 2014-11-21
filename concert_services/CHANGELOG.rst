@@ -2,8 +2,8 @@
 Changelog for package concert_services
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.4 (2014-11-21)
+------------------
 * add waypoint navigation and indoor 2d map prep in meta package
 * Contributors: Jihoon Lee
 
