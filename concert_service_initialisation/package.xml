@@ -1,6 +1,6 @@
 <package>
   <name>concert_service_initialisation</name>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <description>
       Services to initilise environment. Make a map and annotation
   </description>

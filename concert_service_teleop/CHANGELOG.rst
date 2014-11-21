@@ -2,8 +2,8 @@
 Changelog for package concert_service_teleop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2014-11-21)
+------------------
 * teleop_pimp now inherits from resource_pimp in concert_service_utilities
 * updates
 * allows multi remocon control teleop

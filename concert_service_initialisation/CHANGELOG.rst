@@ -2,8 +2,8 @@
 Changelog for package concert_service_initialisation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2014-11-21)
+------------------
 * add rocon_admin_app in admin service
 * updates
 * remove paramter for map annotation
