@@ -2,8 +2,8 @@
 Changelog for package concert_service_indoor_2d_map_prep
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.3 (2014-11-21)
+------------------
 * update service launcher
 * rename initialisation to indoor_2d_map_prep
 * Contributors: Jihoon Lee
