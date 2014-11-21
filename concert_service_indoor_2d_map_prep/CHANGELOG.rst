@@ -2,6 +2,12 @@
 Changelog for package concert_service_indoor_2d_map_prep
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update service launcher
+* rename initialisation to indoor_2d_map_prep
+* Contributors: Jihoon Lee
+
 0.1.2 (2014-11-21)
 ------------------
 * add rocon_admin_app in admin service

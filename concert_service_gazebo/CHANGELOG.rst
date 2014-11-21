@@ -2,6 +2,9 @@
 Changelog for package concert_service_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.2 (2014-11-21)
 ------------------
 * add workflow description closes `#29 <https://github.com/robotics-in-concert/concert_services/issues/29>`_

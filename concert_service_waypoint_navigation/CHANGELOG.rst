@@ -2,6 +2,9 @@
 Changelog for package concert_service_waypoint_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.2 (2014-11-21)
 ------------------
 * add waypoint navigation service
