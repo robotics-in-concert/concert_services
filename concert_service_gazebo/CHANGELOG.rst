@@ -2,6 +2,32 @@
 Changelog for package concert_service_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add workflow description closes `#29 <https://github.com/robotics-in-concert/concert_services/issues/29>`_
+* rename sim to simulation
+* remove unncessary rapps. they are now together with rapps for real robots
+* now use turtlebot_rapps. add playground
+* sim param passing
+* typo in camera flipping
+* Merge branch 'indigo' into use_package_export
+* topic_relay script has migrated to rocon_python_utils
+* leave segbot export as an example
+* use package export to load robot types
+* disable mux for smoother for now.
+* make a map service with scan and robot pose remapping
+* add make a map service
+* now velocity smoother works in turtlebot. /clock flips by default
+* now gazebo uses world_file in service parameter
+* update readme
+* tf fix
+* now teleoping three robots are working
+* Merge branch 'indigo' into gazebo_upgrade
+* flips working
+* flip_rule added
+* now all three models are loading
+* Contributors: Daniel Stonier, Jihoon Lee
+
 0.1.1 (2014-08-26)
 ------------------
 * update for the new rocon launch api, closes `#15 <https://github.com/robotics-in-concert/concert_services/issues/15>`_

@@ -1,0 +1,26 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package concert_service_initialisation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+* add rocon_admin_app in admin service
+* updates
+* remove paramter for map annotation
+* remove wc namespace from pimp
+* now wc namespace is interaction parameter
+* add map annotation
+* rename concert_service_make_a_map to concert_service_initialisation. add map annotation service
+* Contributors: Jihoon Lee
+
+* add rocon_admin_app in admin service
+* updates
+* remove paramter for map annotation
+* remove wc namespace from pimp
+* now wc namespace is interaction parameter
+* add map annotation
+* rename concert_service_make_a_map to concert_service_initialisation. add map annotation service
+* Contributors: Jihoon Lee
+
+0.1.1 (2014-08-26)
+------------------

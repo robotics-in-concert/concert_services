@@ -2,6 +2,13 @@
 Changelog for package concert_service_admin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* rename rocon_admin to concert_admin
+* add role
+* add rocon_admin_app in admin service
+* Contributors: Jihoon Lee
+
 0.1.1 (2014-08-26)
 ------------------
 * usable configuration for service priorities.
