@@ -1,0 +1,10 @@
+name: Indoor 2D Prep 
+description: Make a map and annotate a map 
+author: Jihoon Lee 
+# Priority constants are set in scheduler_msgs.Request.XXX_PRIORITY. This should reflect high priority.
+priority: 10000
+launcher_type: roslaunch
+launcher: concert_service_indoor_2d_map_prep/indoor_2d_map_prep
+icon: concert_service_indoor_2d_map_prep/indoor_2d_map_prep_bubble_icon.png
+interactions: concert_service_indoor_2d_map_prep/indoor_2d_map_prep
+parameters: concert_service_indoor_2d_map_prep/indoor_2d_map_prep
