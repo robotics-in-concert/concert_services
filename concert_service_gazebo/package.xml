@@ -1,6 +1,6 @@
 <package>
   <name>concert_service_gazebo</name>
-  <version>0.1.4</version>
+  <version>0.1.5</version>
   <description>
       Sets up the gazebo robot manager as a service to assist in spawning/killing robots as concert clients.
   </description>
