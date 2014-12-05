@@ -1,4 +1,4 @@
-name: Gazebo Robot Service
+name: Gazebo Robot World
 description: Llaunch multiple robots in Gazebo using Concert framework 
 author: Jihoon Lee, Piyush Khandelwal
 priority: 3
