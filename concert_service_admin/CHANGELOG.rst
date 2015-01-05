@@ -2,6 +2,9 @@
 Changelog for package concert_service_admin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.5 (2014-12-05)
 ------------------
 

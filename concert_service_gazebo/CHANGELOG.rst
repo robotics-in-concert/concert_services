@@ -2,6 +2,13 @@
 Changelog for package concert_service_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add robot gazebos as runpdend fixes `#36 <https://github.com/robotics-in-concert/concert_services/issues/36>`_
+* update install rule for concert service gazebo fixes `#34 <https://github.com/robotics-in-concert/concert_services/issues/34>`_
+* remove topic_relay closes `#35 <https://github.com/robotics-in-concert/concert_services/issues/35>`_
+* Contributors: Jihoon Lee
+
 0.1.5 (2014-12-05)
 ------------------
 * rename gazebo service
