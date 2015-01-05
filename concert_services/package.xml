@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>concert_services</name>
-  <version>0.1.5</version>
+  <version>0.1.6</version>
   <description>
     Officially supported rocon services for the concert framework.
   </description>

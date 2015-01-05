@@ -1,6 +1,6 @@
 <package>
   <name>concert_service_indoor_2d_map_prep</name>
-  <version>0.1.5</version>
+  <version>0.1.6</version>
   <description>
       Services to initilise indoor 2d map environment. Make a map and annotation
   </description>
