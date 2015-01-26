@@ -32,3 +32,11 @@
   display_name: Concert Service Administration
   description: Configure, enable/disable services
   max: 1 
+- name: web_app(http://__WEBSERVER_ADDRESS__/concert_conductor_graph_web/index.html)
+  role: 'Admin'
+  compatibility: rocon:/*/*/indigo/chrome
+  display_name: Concert Conductor Graph
+  description: Conductor graph web viewer
+  parameters:
+    rosbridge_address: __ROSBRIDGE_ADDRESS__
+    rosbridge_port: __ROSBRIDGE_PORT__
