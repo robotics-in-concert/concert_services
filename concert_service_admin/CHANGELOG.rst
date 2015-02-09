@@ -2,8 +2,8 @@
 Changelog for package concert_service_admin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.7 (2015-02-09)
+------------------
 * add conductor web viwer closes `#37 <https://github.com/robotics-in-concert/concert_services/issues/37>`_
 * Contributors: Jihoon Lee
 
