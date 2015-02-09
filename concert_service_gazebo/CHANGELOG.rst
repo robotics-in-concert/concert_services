@@ -2,6 +2,9 @@
 Changelog for package concert_service_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.6 (2015-01-05)
 ------------------
 * add robot gazebos as runpdend fixes `#36 <https://github.com/robotics-in-concert/concert_services/issues/36>`_

@@ -2,6 +2,11 @@
 Changelog for package concert_service_teleop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* update teleop compt closes `#39 <https://github.com/robotics-in-concert/concert_services/issues/39>`_
+* Contributors: Jihoon Lee
+
 0.1.6 (2015-01-05)
 ------------------
 

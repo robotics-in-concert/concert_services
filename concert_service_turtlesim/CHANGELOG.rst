@@ -2,6 +2,9 @@
 Changelog for package concert_service_turtlesim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.6 (2015-01-05)
 ------------------
 
