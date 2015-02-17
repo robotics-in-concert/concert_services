@@ -70,7 +70,7 @@ world_file: concert_service_gazebo/empty_world.world
 
 # An example
 
-Take a look at the [gazebo_solution](https://github.com/robotics-in-concert/rocon_demos/tree/gazebo_concert/gazebo_solution) demo.
+Take a look at the [concert_tutorials/gazebo_concert](https://github.com/robotics-in-concert/rocon_tutorials/tree/indigo/concert_tutorials/gazebo_concert) demo in the [rocon_tutorials repository](https://github.com/robotics-in-concert/rocon_tutorials).
 
 * Install Rocon:
 
