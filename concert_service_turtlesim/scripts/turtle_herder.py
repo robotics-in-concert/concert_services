@@ -244,7 +244,7 @@ class TurtleHerder(object):
     def _ros_service_manager_disable_callback(self, msg):
         self.is_disabled = True
 
-    def shutdown(self):
+    def shutdown(self, msg=None):
         """
           - Send unflip requests
           - Cleanup turtles on the turtlesim canvas.
