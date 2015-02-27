@@ -2,6 +2,9 @@
 Changelog for package concert_service_teleop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.7 (2015-02-09)
 ------------------
 * update teleop compt closes `#39 <https://github.com/robotics-in-concert/concert_services/issues/39>`_
