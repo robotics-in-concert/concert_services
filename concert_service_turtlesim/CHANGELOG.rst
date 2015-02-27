@@ -2,8 +2,8 @@
 Changelog for package concert_service_turtlesim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.8 (2015-02-27)
+------------------
 * provides args for shutdown subscriber closes `#41 <https://github.com/robotics-in-concert/concert_services/issues/41>`_
 * Contributors: Jihoon Lee
 

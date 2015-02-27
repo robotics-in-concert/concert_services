@@ -2,8 +2,8 @@
 Changelog for package concert_service_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.8 (2015-02-27)
+------------------
 * Update link to example in README
   At 6497f837e14672ebc05319534e1c4f8cbeb1860e of the rocon_demos repository
   (https://github.com/robotics-in-concert/rocon_demos), gazebo_solution was

@@ -1,6 +1,6 @@
 <package>
   <name>concert_service_waypoint_navigation</name>
-  <version>0.1.7</version>
+  <version>0.1.8</version>
   <description>
       Command robot to navigate around
   </description>
