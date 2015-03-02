@@ -1,4 +1,4 @@
-name: Indoor 2D Prep 
+name: Indoor 2D Map Prep
 description: Make a map and annotate a map 
 author: Jihoon Lee 
 # Priority constants are set in scheduler_msgs.Request.XXX_PRIORITY. This should reflect high priority.
