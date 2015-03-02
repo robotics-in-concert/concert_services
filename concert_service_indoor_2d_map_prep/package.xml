@@ -23,6 +23,7 @@
   <run_depend>rocon_uri</run_depend>
   <run_depend>scheduler_msgs</run_depend>
   <run_depend>unique_id</run_depend>
+  <run_depend>concert_software_common</run_depend>
 
   <export>
     <concert_service>services/indoor_2d_map_prep/indoor_2d_map_prep.service</concert_service>
