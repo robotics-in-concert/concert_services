@@ -2,6 +2,20 @@
 Changelog for package concert_service_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.8 (2015-02-27)
+------------------
+* Update link to example in README
+  At 6497f837e14672ebc05319534e1c4f8cbeb1860e of the rocon_demos repository
+  (https://github.com/robotics-in-concert/rocon_demos), gazebo_solution was
+  migrated to the rocon_tutorials repository
+  (https://github.com/robotics-in-concert/rocon_tutorials) and renamed to
+  "gazebo_concert". Compare with commit c92d9e40938f0b3e75979a7cba7dc52ceaf572c1
+  of rocon_tutorials.
+* Contributors: Scott Livingston
+
+0.1.7 (2015-02-09)
+------------------
+
 0.1.6 (2015-01-05)
 ------------------
 * add robot gazebos as runpdend fixes `#36 <https://github.com/robotics-in-concert/concert_services/issues/36>`_
