@@ -30,7 +30,7 @@ import concert_service_msgs.msg as concert_service_msgs
 class TeleopPimp(concert_service_utilities.ResourcePimp):
 
     _default_cmd_vel_topic = '/teleop/cmd_vel'
-    _default_compressed_image_topic = '/teleop/compressed_image'
+    _default_image_topic = '/teleop/image'
 
     def setup_variables(self): 
         '''
@@ -79,8 +79,8 @@ class TeleopPimp(concert_service_utilities.ResourcePimp):
         resource.id = unique_id.toMsg(unique_id.fromRandom())
         resource.rapp = self.resource_type
         resource.uri = uri
-        cmd_vel_remapped, compressed_image_topic_remapped = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
-        resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped)]
+        cmd_vel_remapped, image_topic_remapped = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
+        resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_image_topic, image_topic_remapped)]
         return resource
 
     def _get_remapped_topic(self, name):
@@ -88,9 +88,9 @@ class TeleopPimp(concert_service_utilities.ResourcePimp):
           Sets up remapping rules for Rapp configuration
         '''
         cmd_vel_remapped = '/' + name + self._default_cmd_vel_topic
-        compressed_image_topic_remapped = '/' + name + self._default_compressed_image_topic
+        image_topic_remapped = '/' + name + self._default_image_topic
 
-        return cmd_vel_remapped, compressed_image_topic_remapped 
+        return cmd_vel_remapped, image_topic_remapped
 
     def loginfo(self, msg):
         rospy.loginfo("TeleopPimp : %s"%str(msg))
