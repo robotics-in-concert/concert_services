@@ -2,6 +2,13 @@
 Changelog for package concert_service_indoor_2d_map_prep
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix service name
+* Merge branch 'indigo' of https://github.com/robotics-in-concert/concert_services into indigo
+* add concert_software_common dependency closes `#42 <https://github.com/robotics-in-concert/concert_services/issues/42>`_
+* Contributors: Jihoon Lee
+
 0.1.8 (2015-02-27)
 ------------------
 
