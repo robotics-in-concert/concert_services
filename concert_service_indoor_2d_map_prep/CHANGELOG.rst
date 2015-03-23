@@ -2,8 +2,8 @@
 Changelog for package concert_service_indoor_2d_map_prep
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.9 (2015-03-23)
+------------------
 * fix service name
 * Merge branch 'indigo' of https://github.com/robotics-in-concert/concert_services into indigo
 * add concert_software_common dependency closes `#42 <https://github.com/robotics-in-concert/concert_services/issues/42>`_

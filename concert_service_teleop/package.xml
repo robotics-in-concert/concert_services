@@ -1,6 +1,6 @@
 <package>
   <name>concert_service_teleop</name>
-  <version>0.1.8</version>
+  <version>0.1.9</version>
   <description>
       Teleop by request from a rocon interactive program.
   </description>
