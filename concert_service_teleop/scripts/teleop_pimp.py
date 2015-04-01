@@ -26,6 +26,7 @@ import rocon_std_msgs.msg as rocon_std_msgs
 import scheduler_msgs.msg as scheduler_msgs
 import concert_service_msgs.msg as concert_service_msgs
 
+from concert_software_farmer import SoftwareFarmClient, FailedToStartSoftwareException
 
 class TeleopPimp(concert_service_utilities.ResourcePimp):
 
@@ -106,9 +107,35 @@ class TeleopPimp(concert_service_utilities.ResourcePimp):
 # Launch point
 ##############################################################################
 
+WEB_VIDEO_SOFTWARE = 'concert_software_common/web_video_server'
+
+def create_web_video_parameters(address, port):
+    params = []
+    params.append(rocon_std_msgs.KeyValue('address', address))
+    params.append(rocon_std_msgs.KeyValue('port', port))
+    return params
+
 if __name__ == '__main__':
     rospy.init_node('teleop_pimp')
     pimp = TeleopPimp()
-    rospy.spin()
+
+    try:
+        enable_web_video = rospy.get_param('enable_web_video', False)
+        if enable_web_video:
+            address = rospy.get_param('web_video_server_address', 'localhost')
+            port = rospy.get_param('web_video_server_port', 8080)
+            sfc = SoftwareFarmClient()
+            parameters = create_web_video_parameters(address, port)
+            success, namespace, parameters = sfc.allocate(WEB_VIDEO_SOFTWARE, parameters)
+            rospy.loginfo("Teleop pimp : Web video server : %s"%parameters)
+            rospy.loginfo("Done")
+            rospy.spin()
+            sfc.deallocate(WEB_VIDEO_SOFTWARE)
+        else:
+            rospy.loginfo("Done")
+            rospy.spin()
+    except FailedToStartSoftwareException as e:
+        rospy.logerr("Publish World : %s"%str(e))
+
     if not rospy.is_shutdown():
         pimp.cancel_all_requests()
