@@ -127,6 +127,9 @@ if __name__ == '__main__':
             sfc = SoftwareFarmClient()
             parameters = create_web_video_parameters(address, port)
             success, namespace, parameters = sfc.allocate(WEB_VIDEO_SOFTWARE, parameters)
+
+            if not success:
+                raise FailedToStartSoftwareException("Failed to allocate software")
             rospy.loginfo("Teleop pimp : Web video server : %s"%parameters)
             rospy.loginfo("Done")
             rospy.spin()
@@ -135,7 +138,7 @@ if __name__ == '__main__':
             rospy.loginfo("Done")
             rospy.spin()
     except FailedToStartSoftwareException as e:
-        rospy.logerr("Publish World : %s"%str(e))
+        rospy.logerr("Teleop Pimp : %s"%str(e))
 
     if not rospy.is_shutdown():
         pimp.cancel_all_requests()
