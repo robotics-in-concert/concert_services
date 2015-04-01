@@ -111,8 +111,8 @@ WEB_VIDEO_SOFTWARE = 'concert_software_common/web_video_server'
 
 def create_web_video_parameters(address, port):
     params = []
-    params.append(rocon_std_msgs.KeyValue('address', address))
-    params.append(rocon_std_msgs.KeyValue('port', port))
+    params.append(rocon_std_msgs.KeyValue('address', str(address)))
+    params.append(rocon_std_msgs.KeyValue('port', str(port)))
     return params
 
 if __name__ == '__main__':
