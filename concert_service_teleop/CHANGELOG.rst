@@ -2,6 +2,13 @@
 Changelog for package concert_service_teleop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* stringfy parameters `#44 <https://github.com/robotics-in-concert/concert_services/issues/44>`_
+* software hanlding `#44 <https://github.com/robotics-in-concert/concert_services/issues/44>`_
+* teleop pimp can enable web video server with parameter
+* Contributors: Jihoon Lee
+
 0.1.9 (2015-03-23)
 ------------------
 

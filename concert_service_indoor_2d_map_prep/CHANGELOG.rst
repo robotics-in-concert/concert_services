@@ -2,6 +2,9 @@
 Changelog for package concert_service_indoor_2d_map_prep
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.9 (2015-03-23)
 ------------------
 * fix service name
