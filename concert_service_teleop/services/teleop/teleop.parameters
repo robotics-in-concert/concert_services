@@ -1,4 +1,6 @@
 # Default parameter for teleop service
+maximum_linear_velocity: 2.0
+maximum_angular_velocity: 1.57
 allocation_timeout: 15.0
 enable_web_video: false
 web_video_server_address: localhost

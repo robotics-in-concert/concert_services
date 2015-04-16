@@ -9,9 +9,9 @@
   description: Select a robot and make a map in the concert
   max: 1
   parameters:
-    maximum_linear_velocity: 2.0
-    maximum_angular_velocity: 1.57
-    capture_timeout: 15.0
+    maximum_linear_velocity: __maximum_linear_velocity__
+    maximum_angular_velocity: __maximum_angular_velocity__
+    capture_timeout: __allocation_timeout__
     wc_namespace: "/"
 
 - name: concert_map_annotation

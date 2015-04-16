@@ -9,6 +9,6 @@
   description: Select and teleop a robot in the concert
   max: -1
   parameters:
-    maximum_linear_velocity: 2.0
-    maximum_angular_velocity: 1.57
-    capture_timeout: 15.0
+    maximum_linear_velocity: __maximum_linear_velocity__
+    maximum_angular_velocity: __maximum_angular_velocity__
+    capture_timeout: __allocation_timeout__
