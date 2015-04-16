@@ -94,7 +94,7 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
         '''
         cmd_vel_remapped = '/' + name + self._default_cmd_vel_topic
         compressed_image_topic_remapped = '/' + name + self._default_compressed_image_topic
-        map_remapped = '/' + name + self._default_map_topic
+        map_remapped = '/' + name + '/' +  self._default_map_topic
         scan_remapped = '/' + name + self._default_scan_topic
         robot_pose_remapped = '/' + name + '/' + self._default_robot_pose_topic
 
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     pimp = MakeAMapPimp()
 
     try:
-        wc_namespace_param_name = rospy.get_param('wc_namespace_param', 'wc_namespace')
+        wc_namespace_param_name = rospy.get_param('wc_namespace_param')
 
         sfc = SoftwareFarmClient()
         success, namespace, parameters = sfc.allocate(WORLD_CANVAS_SERVER)
@@ -129,10 +129,12 @@ if __name__ == '__main__':
         if not success:
             raise FailedToStartSoftwareException("Failed to allocate software")
         rospy.set_param(wc_namespace_param_name, namespace)
-        rospy.loginfo("Make a map Pimp : World Canvas Server - %s"%namespace)
+        rospy.loginfo("MakeAMap Pimp : World Canvas Server - %s"%namespace)
         rospy.loginfo("Done")
         rospy.spin()
     except FailedToStartSoftwareException as e:
-        rospy.logerr("Teleop Pimp : %s"%str(e))
+        rospy.logerr("MakeAMap Pimp : %s"%str(e))
+    except KeyError as e:
+        rospy.logerr("MakeAMapPimp : Key error %s"%e)
     if not rospy.is_shutdown():
         pimp.cancel_all_requests()
