@@ -12,7 +12,7 @@
     maximum_linear_velocity: __maximum_linear_velocity__
     maximum_angular_velocity: __maximum_angular_velocity__
     capture_timeout: __allocation_timeout__
-    wc_namespace: "/"
+    wc_namespace_param: __wc_namespace_param__
 
 - name: concert_map_annotation
   role: 'User'
@@ -21,4 +21,4 @@
   description: Annotates table and global marker
   max: 1
   parameters:
-    wc_namespace: "/"
+    wc_namespace_param: __wc_namespace_param__

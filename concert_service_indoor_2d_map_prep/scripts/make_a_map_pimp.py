@@ -26,6 +26,8 @@ import rocon_std_msgs.msg as rocon_std_msgs
 import scheduler_msgs.msg as scheduler_msgs
 import concert_service_msgs.msg as concert_service_msgs
 
+from concert_software_farmer import SoftwareFarmClient, FailedToStartSoftwareException
+
 class MakeAMapPimp(concert_service_utilities.ResourcePimp):
 
     _default_cmd_vel_topic = '/teleop/cmd_vel'
@@ -92,7 +94,7 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
         '''
         cmd_vel_remapped = '/' + name + self._default_cmd_vel_topic
         compressed_image_topic_remapped = '/' + name + self._default_compressed_image_topic
-        map_remapped = rospy.get_param('map_topic','/map')
+        map_remapped = '/' + name + self._default_map_topic
         scan_remapped = '/' + name + self._default_scan_topic
         robot_pose_remapped = '/' + name + '/' + self._default_robot_pose_topic
 
@@ -112,9 +114,25 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
 # Launch point
 ##############################################################################
 
+WORLD_CANVAS_SERVER='concert_software_common/world_canvas_server'
+
 if __name__ == '__main__':
     rospy.init_node('make_a_map_pimp')
     pimp = MakeAMapPimp()
-    rospy.spin()
+
+    try:
+        wc_namespace_param_name = rospy.get_param('wc_namespace_param', 'wc_namespace')
+
+        sfc = SoftwareFarmClient()
+        success, namespace, parameters = sfc.allocate(WORLD_CANVAS_SERVER)
+
+        if not success:
+            raise FailedToStartSoftwareException("Failed to allocate software")
+        rospy.set_param(wc_namespace_param_name, namespace)
+        rospy.loginfo("Make a map Pimp : World Canvas Server - %s"%namespace)
+        rospy.loginfo("Done")
+        rospy.spin()
+    except FailedToStartSoftwareException as e:
+        rospy.logerr("Teleop Pimp : %s"%str(e))
     if not rospy.is_shutdown():
         pimp.cancel_all_requests()
