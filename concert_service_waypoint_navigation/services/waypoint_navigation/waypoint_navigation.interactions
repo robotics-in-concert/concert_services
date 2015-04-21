@@ -1,0 +1,12 @@
+###############################################################################
+# Waypoint Navigation 
+###############################################################################
+
+- name: concert_waypint_navigation
+  role: 'User'
+  compatibility: rocon:/pc/*/hydro|indigo/precise|quantal|raring|saucy|trusty
+  display_name: Concert Waypoint Navigation
+  description: Select and navigate a robot in the concert
+  max: -1
+  parameters:
+    capture_timeout: __allocation_timeout__
