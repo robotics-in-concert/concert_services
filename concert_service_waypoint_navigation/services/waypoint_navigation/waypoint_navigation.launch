@@ -1,4 +1,6 @@
 <launch>
   <node pkg="concert_service_waypoint_navigation" type="waypoint_nav_pimp.py" name="waypoint_nav_pimp" required="true">
   </node>
+  <node pkg="concert_service_waypoint_navigation" type="publish_world.py" name="publish_world" required="true">
+  </node>
 </launch>

@@ -94,27 +94,11 @@ class WaypointNavPimp(concert_service_utilities.ResourcePimp):
 # Launch point
 ##############################################################################
 
-WORLD_CANVAS_SERVER='concert_software_common/world_canvas_server'
-
 if __name__ == '__main__':
     rospy.init_node('waypoint_nav_pimp')
+
     pimp = WaypointNavPimp()
-
-    try:
-        wc_namespace_param_name = rospy.get_param('wc_namespace_param')
-
-        sfc = SoftwareFarmClient()
-        success, namespace, parameters = sfc.allocate(WORLD_CANVAS_SERVER)
-
-        if not success:
-            raise FailedToStartSoftwareException("Failed to allocate software")
-        rospy.set_param(wc_namespace_param_name, namespace)
-        rospy.loginfo("WaypointNavPimp : World Canvas Server - %s"%namespace)
-        rospy.loginfo("Done")
-        rospy.spin()
-    except FailedToStartSoftwareException as e:
-        rospy.logerr("WaypointNavPimp : %s"%str(e))
-    except KeyError as e:
-        rospy.logerr("WaypointNavPimp : Key error %s"%e)
-    if not rospy.is_shutdown():
-        pimp.cancel_all_requests()
+    rospy.on_shutdown(pimp.cancel_all_requests())
+    pimp.loginfo("Initialised")
+    rospy.spin()
+    pimp.loginfo("Bye Bye")
