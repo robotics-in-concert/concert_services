@@ -42,6 +42,10 @@ class WaypointNavPimp(concert_service_utilities.ResourcePimp):
         self.available_resource_publisher_name = 'available_waypoint_nav'
         self.capture_topic_name = 'capture_waypoint_nav'
 
+        # it should be rapp's public interface
+        self._default_map_topic = 'map' 
+        self._default_waypoints_topic = 'waypoints'
+
     def ros_capture_callback(self, request_id, msg):
         '''
          Processes the service pair server 'capture_waypiont_nav'. This will run
@@ -77,9 +81,18 @@ class WaypointNavPimp(concert_service_utilities.ResourcePimp):
         resource.rapp = self.resource_type
         resource.uri = uri
         resource.remappings = []
-        #cmd_vel_remapped, compressed_image_topic_remapped, map_remapped, scan_remapped, robot_pose_remapped = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
-        #resource.remappings = [rocon_std_msgs.Remapping(self._default_cmd_vel_topic, cmd_vel_remapped), rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped), rocon_std_msgs.Remapping(self._default_map_topic, map_remapped), rocon_std_msgs.Remapping(self._default_scan_topic, scan_remapped), rocon_std_msgs.Remapping(self._default_robot_pose_topic, robot_pose_remapped)]
+        map_remapped, waypoints_remapped  = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
+        resource.remappings = [rocon_std_msgs.Remapping(self._default_map_topic, map_remapped), rocon_std_msgs.Remapping(self._default_waypoints_topic, waypoints_remapped)]
         return resource
+
+    def _get_remapped_topic(self, name):
+        '''
+          Sets up remapping rules for Rapp configuration
+        '''
+        map_remapped = rospy.resolve_name(rospy.get_param('map_topic'))
+        waypoints_remapped = rospy.resolve_name(rospy.get_param('waypoints_topic'))
+
+        return map_remapped, waypoints_remapped
 
     def loginfo(self, msg):
         rospy.loginfo("WaypointNavPimp : %s"%str(msg))

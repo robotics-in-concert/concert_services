@@ -19,16 +19,15 @@ def publish_map(world, namespace):
     return map_ac
 
 def publish_location(world, namespace):
-    waypoint_topic = rospy.get_param('waypoint_topic')
-    waypoint_viz_topic = rospy.get_param('waypoint_viz_topic')
-    rospy.loginfo("Publish World: Waypoint   - %s"%waypoint_topic)
+    waypoints_topic = rospy.get_param('waypoints_topic')
+    waypoints_viz_topic = rospy.get_param('waypoints_viz_topic')
+    rospy.loginfo("Publish World: Waypoints   - %s"%waypoints_topic)
     
-
-    waypoint_ac = world_canvas_client.AnnotationCollection(world=world, types=['yocs_msgs/Waypoint'], srv_namespace=namespace)
-    waypoint_ac.load_data()
-    waypoint_ac.publish(waypoint_topic, 'yocs_msgs/WaypointList', by_server=False, as_list=True)
-    waypoint_ac.publish_markers(waypoint_viz_topic)
-    return waypoint_ac
+    waypoints_ac = world_canvas_client.AnnotationCollection(world=world, types=['yocs_msgs/Waypoint'], srv_namespace=namespace)
+    waypoints_ac.load_data()
+    waypoints_ac.publish(waypoints_topic, 'yocs_msgs/WaypointList', by_server=False, as_list=True)
+    waypoints_ac.publish_markers(waypoints_viz_topic)
+    return waypoints_ac
 
 if __name__ == '__main__':
     rospy.init_node('world_canvas_client')
