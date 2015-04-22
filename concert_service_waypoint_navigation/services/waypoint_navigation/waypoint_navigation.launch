@@ -3,4 +3,6 @@
   </node>
   <node pkg="concert_service_waypoint_navigation" type="publish_world.py" name="publish_world" required="true">
   </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 map world 100" />
 </launch>
