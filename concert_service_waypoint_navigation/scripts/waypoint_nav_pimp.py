@@ -98,7 +98,7 @@ if __name__ == '__main__':
     rospy.init_node('waypoint_nav_pimp')
 
     pimp = WaypointNavPimp()
-    rospy.on_shutdown(pimp.cancel_all_requests())
+    rospy.on_shutdown(pimp.cancel_all_requests)
     pimp.loginfo("Initialised")
     rospy.spin()
     pimp.loginfo("Bye Bye")
