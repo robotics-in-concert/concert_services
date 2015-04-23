@@ -13,6 +13,7 @@
     maximum_angular_velocity: __maximum_angular_velocity__
     capture_timeout: __allocation_timeout__
     wc_namespace_param: __wc_namespace_param__
+    service_name: __name__
 
 - name: concert_map_annotation
   role: 'User'

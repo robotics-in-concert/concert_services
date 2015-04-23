@@ -12,3 +12,4 @@
     maximum_linear_velocity: __maximum_linear_velocity__
     maximum_angular_velocity: __maximum_angular_velocity__
     capture_timeout: __allocation_timeout__
+    service_name: __name__
