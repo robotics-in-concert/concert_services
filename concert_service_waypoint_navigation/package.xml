@@ -21,6 +21,7 @@
   <run_depend>rocon_apps</run_depend>
   <run_depend>rocon_uri</run_depend>
   <run_depend>scheduler_msgs</run_depend>
+  <run_depend>yocs_msgs</run_depend>
 
   <export>
     <concert_service>services/waypoint_navigation/waypoint_navigation.service</concert_service>
