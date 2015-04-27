@@ -2,6 +2,9 @@
 Changelog for package concert_service_waypoint_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.10 (2015-04-06)
 -------------------
 
