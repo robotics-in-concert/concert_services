@@ -1,0 +1,10 @@
+<launch>
+  <arg name="capture_timeout"/>
+  <arg name="service_name"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find concert_service_waypoint_navigation)/rviz/waypoint_navigation.rviz"/>
+  <node pkg="concert_qt_waypoint_navigation" name="concert_waypoint_navigation_client" type="concert_waypoint_navigation">
+    <param name="capture_timeout" value="$(arg capture_timeout)"/>
+    <param name="service_name" value="$(arg service_name)"/>
+  </node>
+</launch>

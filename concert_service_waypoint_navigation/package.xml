@@ -13,8 +13,15 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>concert_service_link_graph</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>concert_msgs</run_depend>
+  <run_depend>concert_software_farmer</run_depend>
+  <run_depend>concert_service_utilities</run_depend>
+  <run_depend>rocon_std_msgs</run_depend>
   <run_depend>rocon_apps</run_depend>
+  <run_depend>rocon_uri</run_depend>
+  <run_depend>scheduler_msgs</run_depend>
+  <run_depend>yocs_msgs</run_depend>
 
   <export>
     <concert_service>services/waypoint_navigation/waypoint_navigation.service</concert_service>

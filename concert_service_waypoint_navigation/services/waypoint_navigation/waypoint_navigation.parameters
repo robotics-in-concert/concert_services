@@ -1,0 +1,6 @@
+allocation_timeout: 45.0
+world: 'world'
+map_name: 'yujin_office'
+map_topic: '/map'
+waypoints_topic: 'waypoints'
+waypoints_viz_topic: 'waypoints_viz'

@@ -1,6 +1,8 @@
-name: WaypointNavigation 
+name: Waypoint Navigation 
 description: "Commands robot to navigate around"
 author: Jihoon 
 priority: 2
 launcher_type: roslaunch
 launcher: concert_service_waypoint_navigation/waypoint_navigation
+parameters: concert_service_waypoint_navigation/waypoint_navigation
+interactions: concert_service_waypoint_navigation/waypoint_navigation

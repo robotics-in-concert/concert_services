@@ -1,0 +1,13 @@
+###############################################################################
+# Waypoint Navigation 
+###############################################################################
+
+- name: concert_service_waypoint_navigation/waypoint_navigation_controller.launch
+  role: 'User'
+  compatibility: rocon:/pc/*/hydro|indigo/precise|quantal|raring|saucy|trusty
+  display_name: Concert Waypoint Navigation
+  description: Select and navigate a robot in the concert
+  max: -1
+  parameters:
+    capture_timeout: __allocation_timeout__
+    service_name: __name__
