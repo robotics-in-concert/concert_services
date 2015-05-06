@@ -2,6 +2,12 @@
 Changelog for package concert_service_teleop
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.11 (2015-04-27)
+-------------------
+* pass service name as param
+* control interaction params with service param closes `#45 <https://github.com/robotics-in-concert/concert_services/issues/45>`_
+* Contributors: Jihoon Lee
+
 0.1.10 (2015-04-06)
 -------------------
 * stringfy parameters `#44 <https://github.com/robotics-in-concert/concert_services/issues/44>`_

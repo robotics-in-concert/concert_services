@@ -2,6 +2,14 @@
 Changelog for package concert_service_indoor_2d_map_prep
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.11 (2015-04-27)
+-------------------
+* pass service name as param
+* it errors if service param does not exist
+* utilise software farm to use world canvas closes `#38 <https://github.com/robotics-in-concert/concert_services/issues/38>`_
+* control interaction params with service param closes `#45 <https://github.com/robotics-in-concert/concert_services/issues/45>`_
+* Contributors: Jihoon Lee
+
 0.1.10 (2015-04-06)
 -------------------
 
