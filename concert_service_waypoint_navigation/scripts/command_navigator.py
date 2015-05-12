@@ -51,7 +51,9 @@ class NavigateCommander(object):
         self._ac_navigator.send_goal(goal, feedback_cb=self._navigator_feedback)
         self._ac_navigator.wait_for_result()
         result = self._ac_navigator.get_result()
-        self.loginfo("%s, Message : %s"%(result.success,result.message))
+
+        if result:
+            self.loginfo("%s, Message : %s"%(result.success,result.message))
 
     def _navigator_feedback(self, feedback):
         navigator_feed = str("Distance : %s, Remain Time : %s, Message : %s"%(str(feedback.distance),str(feedback.remain_time),str(feedback.message)))
