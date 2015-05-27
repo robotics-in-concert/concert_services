@@ -45,7 +45,7 @@ class MakeAMapPimp(concert_service_utilities.ResourcePimp):
         (service_name, service_description, service_priority, service_id) = concert_service_utilities.get_service_info()
         self.service_priority = service_priority
         self.service_id = service_id
-        self.resource_type = 'turtlebot_rapps/make_a_map'
+        self.resource_type = 'rocon_apps/make_a_map'
         self.available_resource_publisher_name = 'available_make_a_map'
         self.capture_topic_name = 'capture_make_a_map'
 
