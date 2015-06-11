@@ -1,0 +1,10 @@
+###############################################################################
+# Gazebo 
+###############################################################################
+
+- name: gzclient 
+  role: 'User'
+  compatibility: rocon:/pc/*/hydro|indigo/precise|quantal|raring|saucy|trusty
+  display_name: Gazebo Viewer
+  description: Visualises gazebo 
+  max: -1
