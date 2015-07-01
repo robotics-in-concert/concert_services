@@ -2,14 +2,12 @@
 # Teleoperations
 ###############################################################################
 
-- name: concert_teleop
+- name: concert_image_stream
   role: 'User'
   compatibility: rocon:/pc/*/hydro|indigo/precise|quantal|raring|saucy|trusty
-  display_name: Concert Teleop
-  description: Select and teleop a robot in the concert
+  display_name: Concert Image Stream
+  description: Select and stream image from a client in concert
   max: -1
   parameters:
-    maximum_linear_velocity: __maximum_linear_velocity__
-    maximum_angular_velocity: __maximum_angular_velocity__
     capture_timeout: __allocation_timeout__
     service_name: __name__
