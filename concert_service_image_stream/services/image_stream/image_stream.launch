@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="concert_service_image_stream" type="image_stream_pimp.py" name="image_stream_pimp" required="true">
+  </node>
+</launch>

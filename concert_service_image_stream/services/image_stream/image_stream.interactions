@@ -1,0 +1,13 @@
+###############################################################################
+# Teleoperations
+###############################################################################
+
+- name: concert_image_stream
+  role: 'User'
+  compatibility: rocon:/pc/*/hydro|indigo/precise|quantal|raring|saucy|trusty
+  display_name: Concert Image Stream
+  description: Select and stream image from a client in concert
+  max: -1
+  parameters:
+    capture_timeout: __allocation_timeout__
+    service_name: __name__
