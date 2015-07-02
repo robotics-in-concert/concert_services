@@ -52,7 +52,6 @@ class ImageStreamPimp(concert_service_utilities.ResourcePimp):
         '''
         # Todo : request the scheduler for this resource,
         # use self.allocation_timeout to fail gracefully
-
         response = concert_service_msgs.CaptureResourceResponse()
         response.result = False
         if not msg.release:  # i.e. we're capturing:
@@ -80,7 +79,7 @@ class ImageStreamPimp(concert_service_utilities.ResourcePimp):
         resource.rapp = self.resource_type
         resource.uri = uri
         compressed_image_topic_remapped = self._get_remapped_topic(rocon_uri.parse(resource.uri).name.string)
-        resource.remappings = [rocon_std_msgs.Remapping(rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped)]
+        resource.remappings = [rocon_std_msgs.Remapping(self._default_compressed_image_topic, compressed_image_topic_remapped)]
         return resource
 
     def _get_remapped_topic(self, name):
