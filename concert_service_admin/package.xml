@@ -1,6 +1,6 @@
 <package>
   <name>concert_service_admin</name>
-  <version>0.1.11</version>
+  <version>0.1.12</version>
   <description>
       A general purpose admin service (mostly configures rocon interactions).
   </description>

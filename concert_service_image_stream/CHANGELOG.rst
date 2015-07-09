@@ -2,8 +2,8 @@
 Changelog for package concert_service_image_stream
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.12 (2015-07-09)
+-------------------
 * add imagestrea service in meta pkg
 * image stream service
 * update launcher and intreactions
