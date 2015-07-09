@@ -17,6 +17,7 @@
   <run_depend>concert_service_gazebo</run_depend>
   <run_depend>concert_service_teleop</run_depend>
   <run_depend>concert_service_turtlesim</run_depend>
+  <run_depend>concert_service_image_stream</run_depend>
   <run_depend>concert_service_indoor_2d_map_prep</run_depend>
   <run_depend>concert_service_waypoint_navigation</run_depend>
 
