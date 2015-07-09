@@ -2,6 +2,20 @@
 Changelog for package concert_service_waypoint_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'indigo' of https://github.com/robotics-in-concert/concert_services into indigo
+* add navigator client
+* updates
+* add rviz
+* updates
+* update interactions
+* updates
+* add publish world and parameters
+* add interactions and parameters
+* add waypoint nav service
+* Contributors: Jihoon Lee
+
 0.1.11 (2015-04-27)
 -------------------
 

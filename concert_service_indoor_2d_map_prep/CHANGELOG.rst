@@ -2,6 +2,11 @@
 Changelog for package concert_service_indoor_2d_map_prep
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use rocon_apps/make_a_map closes `#48 <https://github.com/robotics-in-concert/concert_services/issues/48>`_
+* Contributors: Jihoon Lee
+
 0.1.11 (2015-04-27)
 -------------------
 * pass service name as param

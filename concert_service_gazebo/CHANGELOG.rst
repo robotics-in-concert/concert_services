@@ -2,6 +2,11 @@
 Changelog for package concert_service_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* gazebo is now headless. viewer is now interactions closes `#32 <https://github.com/robotics-in-concert/concert_services/issues/32>`_
+* Contributors: Jihoon Lee
+
 0.1.11 (2015-04-27)
 -------------------
 

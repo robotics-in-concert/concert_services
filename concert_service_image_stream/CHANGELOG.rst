@@ -4,6 +4,12 @@ Changelog for package concert_service_image_stream
 
 Forthcoming
 -----------
+* add imagestrea service in meta pkg
+* image stream service
+* update launcher and intreactions
+* create image stream service
+* Contributors: Jihoon Lee
+
 * image stream service
 * update launcher and intreactions
 * create image stream service
